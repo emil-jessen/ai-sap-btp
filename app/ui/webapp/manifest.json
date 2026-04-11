@@ -1,5 +1,9 @@
 {
   "_version": "1.58.0",
+  "sap.cloud": {
+    "service": "mybtp",
+    "public": true
+  },
   "sap.app": {
     "id": "my.btp.app.ui",
     "type": "application",

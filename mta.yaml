@@ -122,12 +122,12 @@ modules:
               Name: my-btp-app-html5-repo-host
               ServiceInstanceName: my-btp-app-html5-host
               ServiceKeyName: my-btp-app-html5-host-key
-              sap.cloud.service: my.btp.app
+              sap.cloud.service: mybtp
             - Authentication: OAuth2UserTokenExchange
               Name: my-btp-app-xsuaa
               ServiceInstanceName: my-btp-app-xsuaa
               ServiceKeyName: my-btp-app-xsuaa-key
-              sap.cloud.service: my.btp.app
+              sap.cloud.service: mybtp
           existing_destinations_policy: ignore
     build-parameters:
       no-source: true
