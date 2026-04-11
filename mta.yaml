@@ -80,6 +80,7 @@ modules:
       commands:
         - npm install --prefix .
         - npm run build --prefix .
+        - npm run zip --prefix .
       supported-platforms: []
 
   # ── 4. HTML5 Content Deployer — uploads dist.zip to html5-apps-repo ────

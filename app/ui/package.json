@@ -6,11 +6,13 @@
   "scripts": {
     "start": "ui5 serve",
     "build": "ui5 build --clean-dest",
+    "zip": "node create-zip.js",
     "lint": "eslint webapp"
   },
   "devDependencies": {
     "@ui5/cli": "^4",
-    "@sap/ux-ui5-tooling": "^1"
+    "@sap/ux-ui5-tooling": "^1",
+    "archiver": "^7"
   },
   "ui5": {
     "dependencies": [
