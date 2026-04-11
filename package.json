@@ -7,7 +7,7 @@
     "url": "https://github.com/YOUR_ORG/my-btp-app.git"
   },
   "engines": {
-    "node": ">=18"
+    "node": "20.x"
   },
   "scripts": {
     "start": "cds-serve",
@@ -17,15 +17,15 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@sap/cds": "^7",
-    "@sap/xssec": "^3",
+    "@sap/cds": "^8",
+    "@sap/xssec": "^4",
     "passport": "^0",
     "express": "^4"
   },
   "devDependencies": {
-    "@sap/cds-dk": "^7",
-    "@sap/eslint-plugin-cds": "^2",
-    "eslint": "^8",
+    "@sap/cds-dk": "^8",
+    "@sap/eslint-plugin-cds": "^3",
+    "eslint": "^9",
     "jest": "^29",
     "mbt": "^1"
   },

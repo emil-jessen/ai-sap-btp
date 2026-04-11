@@ -1,0 +1,14 @@
+{
+  "name": "my-btp-app-approuter",
+  "version": "1.0.0",
+  "description": "App Router for my-btp-app",
+  "dependencies": {
+    "@sap/approuter": "^16"
+  },
+  "scripts": {
+    "start": "node node_modules/@sap/approuter/approuter.js"
+  },
+  "engines": {
+    "node": "20.x"
+  }
+}

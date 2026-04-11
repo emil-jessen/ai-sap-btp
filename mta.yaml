@@ -17,7 +17,7 @@ build-parameters:
   before-all:
     - builder: custom
       commands:
-        - npm ci --prefix .
+        - npm install --prefix .
         - npm run build --prefix .
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -49,14 +49,14 @@ modules:
   # ── 2. App Router (handles authentication + routing) ───────────────────
   - name: my-btp-app-approuter
     type: approuter.nodejs
-    path: app/ui
+    path: approuter
     parameters:
       memory: 128M
       disk-quota: 256M
     build-parameters:
       builder: custom
       commands:
-        - npm ci --prefix .
+        - npm install --prefix .
     requires:
       - name: my-btp-app-xsuaa
       - name: my-btp-app-destination
@@ -70,21 +70,33 @@ modules:
     properties:
       TENANT_HOST_PATTERN: "^(.*)-${default-uri}"
 
-  # ── 3. UI5 Fiori Frontend (HTML5 App) ──────────────────────────────────
+  # ── 3. UI5 Fiori Frontend — build step (html5 type builds & zips dist/) ─
+  - name: my-btp-app-ui
+    type: html5
+    path: app/ui
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm install --prefix .
+        - npm run build --prefix .
+      supported-platforms: []
+
+  # ── 4. HTML5 Content Deployer — uploads dist.zip to html5-apps-repo ────
   - name: my-btp-app-ui-deployer
     type: com.sap.application.content
-    path: app/ui
+    path: .
     requires:
       - name: my-btp-app-html5-host
         parameters:
           content-target: true
     build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm ci --prefix .
-        - npm run build --prefix .
-      supported-platforms: []
+      build-result: resources
+      requires:
+        - artifacts:
+            - dist.zip
+          name: my-btp-app-ui
+          target-path: resources/
 
   # ── 4. XSUAA Role/Scope Deployer ───────────────────────────────────────
   - name: my-btp-app-destination-content

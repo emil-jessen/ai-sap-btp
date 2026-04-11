@@ -3,7 +3,7 @@ metadata:
   name: my-btp-app-ui
 type: application
 framework:
-  name: SAPUI5
+  name: OpenUI5
   version: "1.120.0"
   libraries:
     - name: sap.m
@@ -11,7 +11,6 @@ framework:
     - name: sap.f
     - name: sap.ui.layout
     - name: sap.uxap
-    - name: themelib_sap_horizon
 server:
   customMiddleware:
     - name: fiori-tools-proxy
