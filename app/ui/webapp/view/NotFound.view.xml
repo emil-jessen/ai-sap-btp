@@ -1,0 +1,13 @@
+<mvc:View
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m"
+  controllerName="my.btp.app.ui.controller.NotFound">
+
+  <MessagePage
+    title="{i18n>notFoundTitle}"
+    text="{i18n>notFoundText}"
+    description="{i18n>notFoundDescription}"
+    showHeader="false"
+    icon="sap-icon://document" />
+
+</mvc:View>

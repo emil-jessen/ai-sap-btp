@@ -1,0 +1,78 @@
+<mvc:View
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m"
+  xmlns:f="sap.f"
+  xmlns:semantic="sap.f.semantic"
+  controllerName="my.btp.app.ui.controller.List"
+  displayBlock="true">
+
+  <semantic:SemanticPage
+    id="listPage"
+    headerPinnable="false"
+    toggleHeaderOnTitleClick="false">
+
+    <semantic:titleHeading>
+      <Title text="{i18n>listTitle}" />
+    </semantic:titleHeading>
+
+    <semantic:content>
+      <Table
+        id="itemsTable"
+        width="auto"
+        items="{
+          path: '/Items',
+          sorter: { path: 'priority', descending: false }
+        }"
+        noDataText="{i18n>noData}"
+        busyIndicatorDelay="0">
+
+        <headerToolbar>
+          <OverflowToolbar>
+            <Title text="{i18n>tableTitle}" level="H3" />
+            <ToolbarSpacer />
+            <SearchField
+              width="20rem"
+              placeholder="{i18n>searchPlaceholder}"
+              search=".onSearch"
+              liveChange=".onSearch" />
+            <Button
+              id="createBtn"
+              text="{i18n>createButton}"
+              type="Emphasized"
+              press=".onCreate"
+              visible="{= ${/userInfo/isAdmin} === true}" />
+          </OverflowToolbar>
+        </headerToolbar>
+
+        <columns>
+          <Column><Text text="{i18n>colTitle}" /></Column>
+          <Column><Text text="{i18n>colStatus}" /></Column>
+          <Column><Text text="{i18n>colPriority}" /></Column>
+          <Column hAlign="End"><Text text="{i18n>colActions}" /></Column>
+        </columns>
+
+        <items>
+          <ColumnListItem
+            type="Navigation"
+            press=".onItemPress">
+            <cells>
+              <ObjectIdentifier
+                title="{title}"
+                text="{description}" />
+              <ObjectStatus
+                text="{status}"
+                state="{= ${status} === 'done' ? 'Success' : ${status} === 'inProgress' ? 'Warning' : 'Information'}" />
+              <Text text="{priority}" />
+              <Button
+                text="{i18n>markDoneButton}"
+                type="Ghost"
+                press=".onMarkDone"
+                visible="{= ${status} !== 'done'}" />
+            </cells>
+          </ColumnListItem>
+        </items>
+      </Table>
+    </semantic:content>
+
+  </semantic:SemanticPage>
+</mvc:View>

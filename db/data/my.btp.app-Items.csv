@@ -1,0 +1,5 @@
+ID,title,description,status,priority
+"11111111-0000-0000-0000-000000000001","Setup BTP Subaccount","Create and configure your SAP BTP subaccount","done",1
+"11111111-0000-0000-0000-000000000002","Deploy Backend Service","Build and deploy the CAP backend to Cloud Foundry","inProgress",1
+"11111111-0000-0000-0000-000000000003","Configure XSUAA","Set up roles and role collections for the app","open",2
+"11111111-0000-0000-0000-000000000004","Deploy UI5 App","Push the Fiori app to the HTML5 Application Repository","open",2

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My BTP App</title>
+
+  <script id="sap-ui-bootstrap"
+    src="https://ui5.sap.com/1.120.0/resources/sap-ui-cachebuster-info.json"
+    data-sap-ui-theme="sap_horizon"
+    data-sap-ui-resourceroots='{"my.btp.app.ui": "./"}'
+    data-sap-ui-compatversion="edge"
+    data-sap-ui-async="true"
+    data-sap-ui-frameOptions="trusted"
+    data-sap-ui-oninit="module:sap/ui/core/ComponentSupport">
+  </script>
+</head>
+<body class="sapUiBody" id="content">
+  <div data-sap-ui-component
+       data-name="my.btp.app.ui"
+       data-id="container"
+       data-settings='{"id": "myBTPApp"}'>
+  </div>
+</body>
+</html>

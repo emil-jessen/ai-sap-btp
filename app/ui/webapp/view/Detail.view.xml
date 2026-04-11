@@ -1,0 +1,71 @@
+<mvc:View
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m"
+  xmlns:f="sap.f"
+  xmlns:semantic="sap.f.semantic"
+  xmlns:form="sap.ui.layout.form"
+  controllerName="my.btp.app.ui.controller.Detail"
+  displayBlock="true">
+
+  <semantic:SemanticPage
+    id="detailPage"
+    headerPinnable="false"
+    toggleHeaderOnTitleClick="false">
+
+    <semantic:titleHeading>
+      <Title text="{title}" />
+    </semantic:titleHeading>
+
+    <semantic:titleExpandedSubheading>
+      <ObjectStatus
+        text="{status}"
+        state="{= ${status} === 'done' ? 'Success' : ${status} === 'inProgress' ? 'Warning' : 'Information'}" />
+    </semantic:titleExpandedSubheading>
+
+    <semantic:titleNavigationActions>
+      <semantic:EditAction press=".onEdit" />
+    </semantic:titleNavigationActions>
+
+    <semantic:content>
+      <form:SimpleForm
+        editable="false"
+        layout="ResponsiveGridLayout"
+        labelSpanXL="4" labelSpanL="4" labelSpanM="4" labelSpanS="12"
+        columnsXL="1" columnsL="1" columnsM="1">
+        <form:content>
+          <Label text="{i18n>fieldTitle}" />
+          <Input value="{title}" editable="{viewModel>/editable}" />
+
+          <Label text="{i18n>fieldDescription}" />
+          <TextArea value="{description}" rows="4" editable="{viewModel>/editable}" />
+
+          <Label text="{i18n>fieldStatus}" />
+          <Select selectedKey="{status}" enabled="{viewModel>/editable}">
+            <items>
+              <core:Item xmlns:core="sap.ui.core" key="open" text="Open" />
+              <core:Item xmlns:core="sap.ui.core" key="inProgress" text="In Progress" />
+              <core:Item xmlns:core="sap.ui.core" key="done" text="Done" />
+            </items>
+          </Select>
+
+          <Label text="{i18n>fieldPriority}" />
+          <StepInput value="{priority}" min="1" max="5" enabled="{viewModel>/editable}" />
+        </form:content>
+      </form:SimpleForm>
+    </semantic:content>
+
+    <semantic:footerMainAction>
+      <semantic:SaveAction
+        press=".onSave"
+        visible="{viewModel>/editable}" />
+    </semantic:footerMainAction>
+
+    <semantic:negativeAction>
+      <semantic:NegativeAction
+        text="{i18n>cancelButton}"
+        press=".onCancel"
+        visible="{viewModel>/editable}" />
+    </semantic:negativeAction>
+
+  </semantic:SemanticPage>
+</mvc:View>
