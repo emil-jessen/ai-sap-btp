@@ -1,5 +1,5 @@
 {
-  "welcomeFile": "/index.html",
+  "welcomeFile": "/my.btp.app.ui/index.html",
   "authenticationMethod": "route",
   "routes": [
     {
