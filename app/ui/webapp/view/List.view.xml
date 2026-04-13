@@ -1,18 +1,13 @@
 <mvc:View
+  controllerName="my.btp.app.ui.controller.List"
   xmlns:mvc="sap.ui.core.mvc"
   xmlns="sap.m"
-  xmlns:f="sap.f"
   xmlns:semantic="sap.f.semantic"
-  controllerName="my.btp.app.ui.controller.List"
   displayBlock="true">
 
-  <semantic:SemanticPage
-    id="listPage"
-    headerPinnable="false"
-    toggleHeaderOnTitleClick="false">
-
+  <semantic:SemanticPage id="listPage">
     <semantic:titleHeading>
-      <Title text="{i18n>listTitle}" />
+      <Title text="{i18n>appTitle}" level="H2" />
     </semantic:titleHeading>
 
     <semantic:content>
@@ -45,10 +40,18 @@
         </headerToolbar>
 
         <columns>
-          <Column><Text text="{i18n>colTitle}" /></Column>
-          <Column><Text text="{i18n>colStatus}" /></Column>
-          <Column><Text text="{i18n>colPriority}" /></Column>
-          <Column hAlign="End"><Text text="{i18n>colActions}" /></Column>
+          <Column>
+            <Text text="{i18n>colTitle}" />
+          </Column>
+          <Column>
+            <Text text="{i18n>colStatus}" />
+          </Column>
+          <Column>
+            <Text text="{i18n>colPriority}" />
+          </Column>
+          <Column hAlign="End">
+            <Text text="{i18n>colActions}" />
+          </Column>
         </columns>
 
         <items>
@@ -73,6 +76,5 @@
         </items>
       </Table>
     </semantic:content>
-
   </semantic:SemanticPage>
 </mvc:View>
