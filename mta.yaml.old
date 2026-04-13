@@ -3,10 +3,16 @@ ID: my-btp-app
 version: 1.0.0
 description: SAP BTP application — CAP backend + UI5 Fiori frontend
 
+# ────────────────────────────────────────────────────────────────────────────
+# PARAMETERS
+# ────────────────────────────────────────────────────────────────────────────
 parameters:
   enable-parallel-deployments: true
-  deploy_mode: html5-repo
+  deploy_mode: html5-repo          # enables managed HTML5 App host
 
+# ────────────────────────────────────────────────────────────────────────────
+# BUILD PARAMETERS (global)
+# ────────────────────────────────────────────────────────────────────────────
 build-parameters:
   before-all:
     - builder: custom
@@ -14,10 +20,15 @@ build-parameters:
         - npm install --prefix .
         - npm run build --prefix .
 
+# ════════════════════════════════════════════════════════════════════════════
+# MODULES
+# ════════════════════════════════════════════════════════════════════════════
 modules:
+
+  # ── 1. CAP Backend ─────────────────────────────────────────────────────
   - name: my-btp-app-srv
     type: nodejs
-    path: gen/srv
+    path: gen/srv                  # produced by `cds build --production`
     parameters:
       buildpack: nodejs_buildpack
       memory: 256M
@@ -26,7 +37,7 @@ modules:
       builder: npm
       build-result: .
     properties:
-      EXIT: 1
+      EXIT: 1                      # keep CF happy on crash
     requires:
       - name: my-btp-app-xsuaa
       - name: my-btp-app-destination
@@ -35,6 +46,7 @@ modules:
         properties:
           srv-url: ${default-url}
 
+  # ── 2. App Router (handles authentication + routing) ───────────────────
   - name: my-btp-app-approuter
     type: approuter.nodejs
     path: approuter
@@ -58,6 +70,7 @@ modules:
     properties:
       TENANT_HOST_PATTERN: "^(.*)-${default-uri}"
 
+  # ── 3. UI5 Fiori Frontend — build step (html5 type builds & zips dist/) ─
   - name: my-btp-app-ui
     type: html5
     path: app/ui
@@ -70,6 +83,7 @@ modules:
         - npm run zip --prefix .
       supported-platforms: []
 
+  # ── 4. HTML5 Content Deployer — uploads dist.zip to html5-apps-repo ────
   - name: my-btp-app-ui-deployer
     type: com.sap.application.content
     path: .
@@ -80,11 +94,12 @@ modules:
     build-parameters:
       build-result: resources
       requires:
-        - name: my-btp-app-ui
-          artifacts:
+        - artifacts:
             - dist.zip
+          name: my-btp-app-ui
           target-path: resources/
 
+  # ── 4. XSUAA Role/Scope Deployer ───────────────────────────────────────
   - name: my-btp-app-destination-content
     type: com.sap.application.content
     requires:
@@ -101,23 +116,28 @@ modules:
           content-target: true
     parameters:
       content:
-        subaccount:
-          existing_destinations_policy: update
+        instance:
           destinations:
-            - Name: my-btp-app-html5-repo-host
-              Authentication: OAuth2UserTokenExchange
+            - Authentication: OAuth2UserTokenExchange
+              Name: my-btp-app-html5-repo-host
               ServiceInstanceName: my-btp-app-html5-host
               ServiceKeyName: my-btp-app-html5-host-key
               sap.cloud.service: mybtp
-            - Name: my-btp-app-xsuaa
-              Authentication: OAuth2UserTokenExchange
+            - Authentication: OAuth2UserTokenExchange
+              Name: my-btp-app-xsuaa
               ServiceInstanceName: my-btp-app-xsuaa
               ServiceKeyName: my-btp-app-xsuaa-key
               sap.cloud.service: mybtp
+          existing_destinations_policy: ignore
     build-parameters:
       no-source: true
 
+# ════════════════════════════════════════════════════════════════════════════
+# RESOURCES  (BTP service instances)
+# ════════════════════════════════════════════════════════════════════════════
 resources:
+
+  # ── XSUAA (Authorization & Trust Management) ───────────────────────────
   - name: my-btp-app-xsuaa
     type: org.cloudfoundry.managed-service
     parameters:
@@ -128,10 +148,9 @@ resources:
         xsappname: my-btp-app-${org}-${space}
         tenant-mode: dedicated
 
+  # ── Destination Service ─────────────────────────────────────────────────
   - name: my-btp-app-destination
     type: org.cloudfoundry.managed-service
-    requires:
-      - name: srv-api
     parameters:
       service: destination
       service-plan: lite
@@ -139,7 +158,7 @@ resources:
         HTML5Runtime_enabled: true
         init_data:
           instance:
-            existing_destinations_policy: update
+            existing_destinations_policy: ignore
             destinations:
               - Name: my-btp-app-backend
                 Description: CAP backend service
@@ -149,13 +168,17 @@ resources:
                 URL: ~{srv-api/srv-url}
                 HTML5.DynamicDestination: true
                 HTML5.ForwardAuthToken: true
+    requires:
+      - name: srv-api
 
+  # ── HTML5 Application Repository (content host) ────────────────────────
   - name: my-btp-app-html5-host
     type: org.cloudfoundry.managed-service
     parameters:
       service: html5-apps-repo
       service-plan: app-host
 
+  # ── HTML5 Application Repository (runtime) ─────────────────────────────
   - name: my-btp-app-html5-runtime
     type: org.cloudfoundry.managed-service
     parameters:
