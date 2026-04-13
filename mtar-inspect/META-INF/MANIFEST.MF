@@ -1,0 +1,26 @@
+manifest-Version: 1.0
+Created-By: SAP Application Archive Builder 1.2.45
+
+Name: my-btp-app-srv/data.zip
+MTA-Module: my-btp-app-srv
+Content-Type: application/zip
+
+
+Name: my-btp-app-approuter/data.zip
+MTA-Module: my-btp-app-approuter
+Content-Type: application/zip
+
+
+Name: my-btp-app-ui-deployer/resources/data.zip
+MTA-Module: my-btp-app-ui-deployer
+Content-Type: application/zip
+
+
+Name: xs-security.json
+MTA-Resource: my-btp-app-xsuaa
+Content-Type: application/json
+
+
+Name: META-INF/mtad.yaml
+Content-Type: text/plain
+

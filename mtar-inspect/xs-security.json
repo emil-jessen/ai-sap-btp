@@ -1,0 +1,57 @@
+{
+  "xsappname": "my-btp-app",
+  "tenant-mode": "dedicated",
+  "description": "XSUAA security config for my-btp-app",
+  "scopes": [
+    {
+      "name": "$XSAPPNAME.Viewer",
+      "description": "Read access to all Items"
+    },
+    {
+      "name": "$XSAPPNAME.Admin",
+      "description": "Full CRUD access to all Items"
+    }
+  ],
+  "attributes": [],
+  "role-templates": [
+    {
+      "name": "Viewer",
+      "description": "View Items",
+      "scope-references": [
+        "$XSAPPNAME.Viewer"
+      ],
+      "attribute-references": []
+    },
+    {
+      "name": "Admin",
+      "description": "Manage Items (create, update, delete)",
+      "scope-references": [
+        "$XSAPPNAME.Viewer",
+        "$XSAPPNAME.Admin"
+      ],
+      "attribute-references": []
+    }
+  ],
+  "role-collections": [
+    {
+      "name": "MyBTPApp_Viewer",
+      "description": "Viewer role collection for My BTP App",
+      "role-template-references": [
+        "$XSAPPNAME.Viewer"
+      ]
+    },
+    {
+      "name": "MyBTPApp_Admin",
+      "description": "Admin role collection for My BTP App",
+      "role-template-references": [
+        "$XSAPPNAME.Admin"
+      ]
+    }
+  ],
+  "oauth2-configuration": {
+    "redirect-uris": [
+      "https://*.cfapps.*.hana.ondemand.com/**",
+      "https://*.hana.ondemand.com/**"
+    ]
+  }
+}
