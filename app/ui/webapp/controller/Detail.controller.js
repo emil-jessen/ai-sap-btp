@@ -1,74 +1,87 @@
 sap.ui.define([
   "sap/ui/core/mvc/Controller",
+  "sap/ui/core/UIComponent",
   "sap/ui/model/json/JSONModel",
   "sap/m/MessageToast",
   "sap/m/MessageBox"
-], function (Controller, JSONModel, MessageToast, MessageBox) {
+], function (Controller, UIComponent, JSONModel, MessageToast, MessageBox) {
   "use strict";
 
   return Controller.extend("my.btp.app.ui.controller.Detail", {
-
     onInit: function () {
-      // View model to track edit state
-      const oViewModel = new JSONModel({ editable: false });
+      var oViewModel = new JSONModel({
+        editable: false
+      });
+
       this.getView().setModel(oViewModel, "viewModel");
 
-      const oRouter = this.getOwnerComponent().getRouter();
-      oRouter.getRoute("detail").attachPatternMatched(this._onRouteMatched, this);
+      var oRouter = UIComponent.getRouterFor(this);
+      oRouter.getRoute("detail").attachPatternMatched(this._onObjectMatched, this);
     },
 
-    _onRouteMatched: function (oEvent) {
-      const sItemId = decodeURIComponent(oEvent.getParameter("arguments").itemId);
+    _onObjectMatched: function (oEvent) {
+      var sId = oEvent.getParameter("arguments").id;
+      var oView = this.getView();
+      var oModel = oView.getModel();
 
-      if (sItemId === "new") {
-        this._createNewItem();
-      } else {
-        this.getView().bindElement({
-          path: `/Items(${sItemId})`,
-          parameters: { "$$updateGroupId": "editGroup" }
-        });
-        this.getView().getModel("viewModel").setProperty("/editable", false);
+      if (!oModel || !sId) {
+        return;
       }
-    },
 
-    _createNewItem: function () {
-      const oModel    = this.getView().getModel();
-      const oListBinding = oModel.bindList("/Items");
-      const oContext  = oListBinding.create({
-        title: "",
-        description: "",
-        status: "open",
-        priority: 1
+      oView.bindElement({
+        path: "/Items(" + this._formatGuid(sId) + ")"
       });
-      this.getView().setBindingContext(oContext);
-      this.getView().getModel("viewModel").setProperty("/editable", true);
     },
 
-    // ── Edit / Save / Cancel ───────────────────────────────────────────────
     onEdit: function () {
       this.getView().getModel("viewModel").setProperty("/editable", true);
     },
 
-    onSave: function () {
-      const oModel = this.getView().getModel();
-      const i18n   = this.getView().getModel("i18n").getResourceBundle();
+    onSave: async function () {
+      var oView = this.getView();
+      var oModel = oView.getModel();
+      var oViewModel = oView.getModel("viewModel");
 
-      oModel.submitBatch("editGroup")
-        .then(() => {
-          MessageToast.show(i18n.getText("saveSuccess"));
-          this.getView().getModel("viewModel").setProperty("/editable", false);
-          this.getOwnerComponent().getRouter().navTo("list");
-        })
-        .catch((oError) => {
-          MessageBox.error(oError.message || i18n.getText("genericError"));
-        });
+      if (!oModel) {
+        return;
+      }
+
+      try {
+        await oModel.submitBatch?.();
+        oViewModel.setProperty("/editable", false);
+        MessageToast.show("Changes saved.");
+      } catch (oError) {
+        MessageBox.error(this._extractErrorMessage(oError, "Failed to save changes."));
+      }
     },
 
     onCancel: function () {
-      const oModel = this.getView().getModel();
-      oModel.resetChanges("editGroup");
-      this.getView().getModel("viewModel").setProperty("/editable", false);
-      this.getOwnerComponent().getRouter().navTo("list");
+      var oView = this.getView();
+      var oModel = oView.getModel();
+      var oViewModel = oView.getModel("viewModel");
+
+      try {
+        if (oModel && oModel.resetChanges) {
+          oModel.resetChanges();
+        }
+      } catch (oError) {
+        // Ignore reset issues and just leave edit mode.
+      }
+
+      oViewModel.setProperty("/editable", false);
+      MessageToast.show("Changes canceled.");
+    },
+
+    _formatGuid: function (sId) {
+      // OData V4 key predicate for UUID string keys
+      return "'" + sId + "'";
+    },
+
+    _extractErrorMessage: function (oError, sFallback) {
+      if (oError && oError.message) {
+        return oError.message;
+      }
+      return sFallback;
     }
   });
 });
