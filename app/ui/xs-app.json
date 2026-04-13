@@ -4,14 +4,16 @@
   "routes": [
     {
       "source": "^/catalog/(.*)$",
+      "target": "/catalog/$1",
       "destination": "my-btp-app-backend",
       "authenticationType": "xsuaa",
-      "csrfProtection": true
+      "csrfProtection": false
     },
     {
       "source": "^(.*)$",
       "target": "$1",
-      "authenticationType": "none"
+      "service": "html5-apps-repo-rt",
+      "authenticationType": "xsuaa"
     }
   ]
 }
