@@ -4,7 +4,7 @@ sap.ui.define([
 ], function (Controller, UIComponent) {
   "use strict";
 
-  return Controller.extend("my.btp.app.ui.controller.NotFound", {
+  return Controller.extend("mybtpappui.controller.NotFound", {
     onNavBack: function () {
       UIComponent.getRouterFor(this).navTo("list", {}, true);
     }

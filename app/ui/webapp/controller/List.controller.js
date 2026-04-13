@@ -8,7 +8,7 @@ sap.ui.define([
 ], function (Controller, Filter, FilterOperator, UIComponent, MessageToast, MessageBox) {
   "use strict";
 
-  return Controller.extend("my.btp.app.ui.controller.List", {
+  return Controller.extend("mybtpappui.controller.List", {
     onInit: function () {
       // You can initialize a local view model here later if needed.
     },

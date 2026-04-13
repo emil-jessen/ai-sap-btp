@@ -1,5 +1,5 @@
 <!-- edited with XMLSpy v2013 (x64) (http://www.altova.com) by Emil Jessen (Emil Jessen Consulting) -->
-<mvc:View controllerName="my.btp.app.ui.controller.Detail" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:semantic="sap.f.semantic" xmlns:form="sap.ui.layout.form" xmlns:core="sap.ui.core" displayBlock="true">
+<mvc:View controllerName="mybtpappui.controller.Detail" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:semantic="sap.f.semantic" xmlns:form="sap.ui.layout.form" xmlns:core="sap.ui.core" displayBlock="true">
 	<semantic:SemanticPage id="detailPage">
 		<semantic:titleHeading>
 			<Title text="{title}" level="H2"/>

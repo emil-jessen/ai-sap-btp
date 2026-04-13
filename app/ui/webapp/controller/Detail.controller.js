@@ -7,7 +7,7 @@ sap.ui.define([
 ], function (Controller, UIComponent, JSONModel, MessageToast, MessageBox) {
   "use strict";
 
-  return Controller.extend("my.btp.app.ui.controller.Detail", {
+  return Controller.extend("mybtpappui.controller.Detail", {
     onInit: function () {
       var oViewModel = new JSONModel({
         editable: false

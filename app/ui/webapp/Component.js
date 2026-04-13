@@ -1,11 +1,11 @@
 sap.ui.define([
   "sap/ui/core/UIComponent",
   "sap/ui/Device",
-  "my/btp/app/ui/model/models"
+  "mybtpappui/model/models"
 ], function (UIComponent, Device, models) {
   "use strict";
 
-  return UIComponent.extend("my.btp.app.ui.Component", {
+  return UIComponent.extend("mybtpappui.Component", {
 
     metadata: {
       manifest: "json"

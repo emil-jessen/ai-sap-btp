@@ -1,7 +1,7 @@
 <mvc:View
   xmlns:mvc="sap.ui.core.mvc"
   xmlns="sap.m"
-  controllerName="my.btp.app.ui.controller.NotFound">
+  controllerName="mybtpappui.controller.NotFound">
 
   <MessagePage
     title="{i18n>notFoundTitle}"

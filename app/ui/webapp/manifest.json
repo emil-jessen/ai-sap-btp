@@ -1,11 +1,11 @@
 {
   "_version": "1.58.0",
   "sap.cloud": {
-    "service": "mybtp",
+    "service": "mybtpappui",
     "public": true
   },
   "sap.app": {
-    "id": "my.btp.app.ui",
+    "id": "mybtpappui",
     "type": "application",
     "title": "{{appTitle}}",
     "description": "{{appDescription}}",
@@ -83,7 +83,7 @@
       "i18n": {
         "type": "sap.ui.model.resource.ResourceModel",
         "settings": {
-          "bundleName": "my.btp.app.ui.i18n.i18n"
+          "bundleName": "mybtpappui.i18n.i18n"
         }
       }
     },
@@ -91,7 +91,7 @@
       "config": {
         "routerClass": "sap.m.routing.Router",
         "viewType": "XML",
-        "viewPath": "my.btp.app.ui.view",
+        "viewPath": "mybtpappui.view",
         "controlId": "app",
         "controlAggregation": "pages",
         "transition": "slide",
