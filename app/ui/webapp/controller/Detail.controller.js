@@ -20,16 +20,16 @@ sap.ui.define([
     },
 
     _onObjectMatched: function (oEvent) {
-      var sId = oEvent.getParameter("arguments").id;
+      var sItemId = oEvent.getParameter("arguments").itemId;
       var oView = this.getView();
       var oModel = oView.getModel();
 
-      if (!oModel || !sId) {
+      if (!oModel || !sItemId) {
         return;
       }
 
       oView.bindElement({
-        path: "/Items(" + this._formatGuid(sId) + ")"
+        path: "/Items('" + sItemId + "')"
       });
     },
 
@@ -42,16 +42,14 @@ sap.ui.define([
       var oModel = oView.getModel();
       var oViewModel = oView.getModel("viewModel");
 
-      if (!oModel) {
-        return;
-      }
-
       try {
-        await oModel.submitBatch?.();
+        if (oModel && oModel.submitBatch) {
+          await oModel.submitBatch();
+        }
         oViewModel.setProperty("/editable", false);
         MessageToast.show("Changes saved.");
       } catch (oError) {
-        MessageBox.error(this._extractErrorMessage(oError, "Failed to save changes."));
+        MessageBox.error(oError?.message || "Failed to save changes.");
       }
     },
 
@@ -60,28 +58,12 @@ sap.ui.define([
       var oModel = oView.getModel();
       var oViewModel = oView.getModel("viewModel");
 
-      try {
-        if (oModel && oModel.resetChanges) {
-          oModel.resetChanges();
-        }
-      } catch (oError) {
-        // Ignore reset issues and just leave edit mode.
+      if (oModel && oModel.resetChanges) {
+        oModel.resetChanges();
       }
 
       oViewModel.setProperty("/editable", false);
       MessageToast.show("Changes canceled.");
-    },
-
-    _formatGuid: function (sId) {
-      // OData V4 key predicate for UUID string keys
-      return "'" + sId + "'";
-    },
-
-    _extractErrorMessage: function (oError, sFallback) {
-      if (oError && oError.message) {
-        return oError.message;
-      }
-      return sFallback;
     }
   });
 });

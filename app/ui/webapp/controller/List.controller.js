@@ -54,9 +54,9 @@ sap.ui.define([
 
       var sId = oContext.getProperty("ID");
 
-      UIComponent.getRouterFor(this).navTo("detail", {
-        id: sId
-      });
+UIComponent.getRouterFor(this).navTo("detail", {
+  itemId: sId
+});
     },
 
     onCreate: function () {
