@@ -535,6 +535,7 @@ Latest checkpoint:
   - Deployed this layout change with operation `65c42e28-37e5-11f1-938a-eeee0a8c9147`; both apps started successfully.
   - Result rendering now uses filterable HTML tables for all three object reads. Each visible column gets a native search input that filters rows client-side without making additional Figaf API calls. Scenario filters apply to the default three-column view and the expanded all-column view.
   - Deployed filterable table rendering with operation `e0afbdbf-37e8-11f1-99cd-eeee0a9ddd6b`; both apps started successfully.
+  - CI lint fix: `eslint.config.cjs` now declares Node 20 globals used by CAP (`fetch`, `URL`, `URLSearchParams`, `Buffer`) for `srv/**/*.js`, and unused catch bindings in `srv/figaf-service.js` were removed. `npm run lint --if-present` passes locally.
 - Update this file whenever:
   - a new auth/destination finding is made
   - a new endpoint is confirmed

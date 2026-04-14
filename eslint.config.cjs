@@ -35,6 +35,10 @@ module.exports = [
       globals: {
         console: "readonly",
         process: "readonly",
+        fetch: "readonly",
+        URL: "readonly",
+        URLSearchParams: "readonly",
+        Buffer: "readonly",
         SELECT: "readonly",
         UPDATE: "readonly"
       }

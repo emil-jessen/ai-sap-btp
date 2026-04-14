@@ -436,7 +436,7 @@ module.exports = class FigafService extends cds.ApplicationService {
 
       url.hostname = [`${firstLabel}-internal`, ...rest].join('.');
       return url.toString().replace(/\/+$/, '');
-    } catch (error) {
+    } catch {
       return '';
     }
   }
@@ -444,7 +444,7 @@ module.exports = class FigafService extends cds.ApplicationService {
   _safeHost(baseUrl) {
     try {
       return new URL(baseUrl).host;
-    } catch (error) {
+    } catch {
       return 'configured Figaf host';
     }
   }
@@ -589,7 +589,7 @@ module.exports = class FigafService extends cds.ApplicationService {
       const payload = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
       const paddedPayload = payload.padEnd(payload.length + ((4 - (payload.length % 4)) % 4), '=');
       return JSON.parse(Buffer.from(paddedPayload, 'base64').toString('utf8'));
-    } catch (error) {
+    } catch {
       return {};
     }
   }
@@ -627,7 +627,7 @@ module.exports = class FigafService extends cds.ApplicationService {
 
     try {
       return JSON.parse(text);
-    } catch (error) {
+    } catch {
       return value;
     }
   }
