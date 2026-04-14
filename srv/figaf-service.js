@@ -21,6 +21,7 @@ module.exports = class FigafService extends cds.ApplicationService {
     this.on('companySubsidiaries', (req) => this._respond(req, () => this._readConfiguredModel('companySubsidiaries', req)));
     this.on('scenarios', (req) => this._respond(req, () => this._readScenarios(req)));
     this.on('aiConsistencyAnalysis', (req) => this._respond(req, () => this._aiConsistencyAnalysis(req)));
+    this.on('aiAdviceChat', (req) => this._respond(req, () => this._aiAdviceChat(req)));
 
     return super.init();
   }
@@ -195,7 +196,16 @@ module.exports = class FigafService extends cds.ApplicationService {
 
     const text = await response.text();
     if (!response.ok) {
-      throw new Error(`OpenAI consistency analysis failed with HTTP ${response.status}: ${text.slice(0, 300)}`);
+      const quotaMessage = this._openAiQuotaMessage(response.status, text);
+      if (quotaMessage) {
+        return {
+          configured: false,
+          model,
+          message: quotaMessage,
+          findings: []
+        };
+      }
+      throw new Error(`OpenAI consistency analysis failed with HTTP ${response.status}: ${this._openAiErrorMessage(text)}`);
     }
 
     const parsed = JSON.parse(text);
@@ -212,6 +222,87 @@ module.exports = class FigafService extends cds.ApplicationService {
     };
   }
 
+  async _aiAdviceChat(req) {
+    const apiKey = process.env.OPENAI_API_KEY;
+    const model = process.env.OPENAI_MODEL || DEFAULT_OPENAI_MODEL;
+    const input = this._parseAiPayload(req.data?.payload);
+
+    if (!apiKey) {
+      return {
+        configured: false,
+        model,
+        answer: [
+          'AI advice chat is not configured yet.',
+          'Set OPENAI_API_KEY on my-btp-app-srv, then redeploy or restage the application.',
+          'The deterministic GAP report rules are still available without this key.'
+        ].join(' ')
+      };
+    }
+
+    const response = await fetch('https://api.openai.com/v1/responses', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model,
+        temperature: 0.2,
+        input: [
+          {
+            role: 'system',
+            content: [
+              {
+                type: 'input_text',
+                text: [
+                  'You are a practical Figaf IS TPM advisor.',
+                  'Help users understand inconsistencies and suggest concrete remediation steps.',
+                  'Use the deterministic rules and naming guideline as the foundation.',
+                  'When context is incomplete, say what data is missing and give a safe next step.',
+                  'Keep answers concise, actionable, and specific to Figaf B2B partners, companies/subsidiaries, scenarios, MIGs, MAGs, agreements, and statuses.'
+                ].join(' ')
+              }
+            ]
+          },
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'input_text',
+                text: JSON.stringify({
+                  namingGuideline: this._namingGuidelineSummary(),
+                  chat: input
+                })
+              }
+            ]
+          }
+        ]
+      })
+    });
+
+    const text = await response.text();
+    if (!response.ok) {
+      const quotaMessage = this._openAiQuotaMessage(response.status, text);
+      if (quotaMessage) {
+        return {
+          configured: false,
+          model,
+          answer: quotaMessage
+        };
+      }
+      throw new Error(`OpenAI advice chat failed with HTTP ${response.status}: ${this._openAiErrorMessage(text)}`);
+    }
+
+    const parsed = JSON.parse(text);
+    const answer = this._responseOutputText(parsed);
+
+    return {
+      configured: true,
+      model,
+      answer: answer || 'I could not generate advice for this question.'
+    };
+  }
+
   _parseAiPayload(payload) {
     if (!payload) {
       return {};
@@ -221,6 +312,36 @@ module.exports = class FigafService extends cds.ApplicationService {
       return JSON.parse(payload);
     } catch {
       return { rawPayload: String(payload).slice(0, 20000) };
+    }
+  }
+
+  _openAiQuotaMessage(status, text) {
+    if (status !== 429) {
+      return '';
+    }
+
+    const message = this._openAiErrorMessage(text);
+    if (/insufficient_quota|quota|billing/i.test(message)) {
+      return [
+        'The AI layer is temporarily unavailable because the OpenAI project has exceeded its current quota.',
+        'The deterministic Figaf rule checks and GAP report remain available.',
+        'Update the OpenAI project billing/quota or configure a different OPENAI_API_KEY, then retry the AI analysis.'
+      ].join(' ');
+    }
+
+    return [
+      'The AI layer is temporarily rate limited by OpenAI.',
+      'The deterministic Figaf rule checks and GAP report remain available.',
+      'Wait a moment and retry the AI analysis.'
+    ].join(' ');
+  }
+
+  _openAiErrorMessage(text) {
+    try {
+      const payload = JSON.parse(text);
+      return payload?.error?.message || String(text || '').slice(0, 300);
+    } catch {
+      return String(text || '').slice(0, 300);
     }
   }
 

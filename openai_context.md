@@ -571,6 +571,18 @@ Latest checkpoint:
     - `OPENAI_MODEL` defaults to `gpt-4.1-mini` in `mta.yaml`.
     - If `OPENAI_API_KEY` is missing, the UI shows that the AI layer is not configured and keeps the rule-only findings.
     - Build checks passed (`npm run lint --if-present`, inline script syntax check, `npm run build`, `npx mbt build -p cf`), but deploy was blocked because the local CF login had expired. Re-run `cf login` and then `cf deploy mta_archives/my-btp-app_1.0.0.mtar`.
+  - AI advisor chat implementation:
+    - Added CAP action `/figaf/aiAdviceChat` in `srv/figaf-service.cds` and `srv/figaf-service.js`.
+    - Added an `AI advisor` chat panel below the Figaf result table in `app/ui/webapp/index.html`.
+    - Chat requests include the user question, recent chat history, selected Figaf agent label, current loaded table/model summary, and the currently open GAP report when one is active.
+    - The backend uses the same `OPENAI_API_KEY` and `OPENAI_MODEL` configuration as the AI consistency analyzer.
+    - If `OPENAI_API_KEY` is not configured, the chat returns a graceful setup message instead of failing the UI.
+    - Build checks passed (`npm run lint --if-present`, inline script syntax check, `npm run build`, `npx mbt build -p cf`), and `mta_archives/my-btp-app_1.0.0.mtar` is ready to deploy after `cf login`.
+  - OpenAI quota handling:
+    - Runtime showed HTTP 429 with `insufficient_quota`, meaning the OpenAI project/key quota or billing is exhausted.
+    - Backend now converts OpenAI quota/rate-limit 429 responses into graceful unavailable messages for both `/figaf/aiConsistencyAnalysis` and `/figaf/aiAdviceChat`.
+    - GAP reports mark the AI layer as `unavailable` instead of showing the raw OpenAI error. Rule-based GAP findings remain usable.
+    - Rebuilt `mta_archives/my-btp-app_1.0.0.mtar` after this change; deploy still requires a refreshed `cf login`.
 - Update this file whenever:
   - a new auth/destination finding is made
   - a new endpoint is confirmed

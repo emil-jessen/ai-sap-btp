@@ -96,6 +96,7 @@
     var currentTableState = null;
     var gapReports = {};
     var currentGapReportId = "";
+    var chatHistory = [];
     var AUTH_REFRESH_MESSAGE = "Your BTP app session needs to be refreshed. Sign in again, then retry the Figaf read.";
 
     async function readJson(url) {
@@ -492,6 +493,9 @@
       if (report.aiStatus === "skipped") {
         return "not configured";
       }
+      if (report.aiStatus === "unavailable") {
+        return "unavailable";
+      }
       if (report.aiStatus === "error") {
         return "error";
       }
@@ -530,7 +534,7 @@
           };
         });
 
-        report.aiStatus = analysis.configured ? "done" : "skipped";
+        report.aiStatus = analysis.configured ? "done" : "unavailable";
         report.aiMessage = analysis.message || "";
         aiFindings.forEach(function (finding) {
           addFinding(report.findings, finding);
@@ -894,6 +898,74 @@
       }
     }
 
+    function appendChatMessage(role, text) {
+      var container = document.getElementById("figafChatMessages");
+      var message = document.createElement("div");
+      message.className = "figafChatMessage " + (role === "user" ? "figafChatMessageUser" : "figafChatMessageAssistant");
+      message.innerHTML = "<strong>" + escapeHtml(role === "user" ? "You" : "Advisor") + "</strong><p>" + escapeHtml(text) + "</p>";
+      container.appendChild(message);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function chatContext() {
+      var report = currentGapReportId ? gapReports[currentGapReportId] : null;
+      var tableContext = currentTableState ? {
+        modelName: currentTableState.modelName,
+        loadedRecords: currentTableState.records && currentTableState.records.value ? currentTableState.records.value.length : 0,
+        onlyInconsistencies: currentTableState.onlyInconsistencies,
+        showingAllColumns: currentTableState.showAll
+      } : null;
+
+      return {
+        selectedAgent: selectedAgentLabel(),
+        table: tableContext,
+        activeGapReport: report ? {
+          title: report.title,
+          model: report.model,
+          row: report.row,
+          findings: report.findings,
+          aiStatus: report.aiStatus
+        } : null
+      };
+    }
+
+    function selectedAgentLabel() {
+      var select = document.getElementById("figafAgentSelect");
+      return select.options[select.selectedIndex] ? select.options[select.selectedIndex].text : "Default agent";
+    }
+
+    async function askAdvisor(question) {
+      chatHistory.push({ role: "user", content: question });
+      appendChatMessage("user", question);
+      appendChatMessage("assistant", "Thinking through the Figaf context...");
+
+      try {
+        var result = await postJson("/figaf/aiAdviceChat", {
+          payload: JSON.stringify({
+            question: question,
+            history: chatHistory.slice(-8),
+            context: chatContext()
+          })
+        });
+        var response = result.value || result;
+        var answer = response.answer || "No advice was returned.";
+        chatHistory.push({ role: "assistant", content: answer });
+        replaceLastAdvisorMessage(answer);
+      } catch (error) {
+        replaceLastAdvisorMessage("Could not get advisor response: " + error.message);
+      }
+    }
+
+    function replaceLastAdvisorMessage(text) {
+      var messages = document.querySelectorAll(".figafChatMessageAssistant");
+      var last = messages[messages.length - 1];
+      if (!last) {
+        appendChatMessage("assistant", text);
+        return;
+      }
+      last.querySelector("p").textContent = text;
+    }
+
     function renderTable(title, records, columns, options) {
       var container = document.getElementById("figafDataTable");
       var allColumns = options && options.allColumns ? options.allColumns : columns;
@@ -1049,6 +1121,17 @@
       var select = document.getElementById("figafAgentSelect");
       var label = select.options[select.selectedIndex] ? select.options[select.selectedIndex].text : "Default agent";
       setConnectionStatus("Ready to read Figaf data for " + label + ".");
+    });
+
+    document.getElementById("figafChatForm").addEventListener("submit", function (event) {
+      event.preventDefault();
+      var input = document.getElementById("figafChatInput");
+      var question = input.value.trim();
+      if (!question) {
+        return;
+      }
+      input.value = "";
+      askAdvisor(question);
     });
 
     document.addEventListener("click", function (event) {

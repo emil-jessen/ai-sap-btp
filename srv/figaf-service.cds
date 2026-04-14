@@ -76,6 +76,12 @@ service FigafService {
     findings   : array of AiFinding;
   }
 
+  type AiChatResponse {
+    configured : Boolean;
+    model      : String;
+    answer     : String;
+  }
+
   function status() returns ConnectionStatus;
   function connectionGuide() returns array of ConnectionStep;
   function agents() returns array of FigafAgent;
@@ -84,4 +90,5 @@ service FigafService {
   function companySubsidiaries(agentId : String) returns array of FigafRecord;
   function scenarios(agentId : String) returns array of FigafRecord;
   action aiConsistencyAnalysis(payload : LargeString) returns AiAnalysis;
+  action aiAdviceChat(payload : LargeString) returns AiChatResponse;
 }

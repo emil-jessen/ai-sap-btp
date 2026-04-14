@@ -304,6 +304,105 @@ body {
   font-weight: 700;
 }
 
+.figafAdvisor {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: #ffffff;
+  border: 1px solid #d8e1e5;
+  border-radius: 8px;
+}
+
+.figafAdvisorHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.figafAdvisorHeader .figafBodyText {
+  max-width: 24rem;
+}
+
+.figafChatMessages {
+  display: flex;
+  flex-direction: column;
+  max-height: 22rem;
+  overflow-y: auto;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: #f5f7f8;
+  border: 1px solid #d8e1e5;
+  border-radius: 8px;
+}
+
+.figafChatMessage {
+  display: flex;
+  flex-direction: column;
+  max-width: min(42rem, 100%);
+  gap: 0.3rem;
+  padding: 0.85rem;
+  border: 1px solid #d8e1e5;
+  border-radius: 8px;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.figafChatMessage strong {
+  color: #18282f;
+}
+
+.figafChatMessage p {
+  margin: 0;
+  color: #47626d;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.figafChatMessageUser {
+  align-self: flex-end;
+  border-color: #c4d8d4;
+  background: #e8f1ef;
+}
+
+.figafChatMessageAssistant {
+  align-self: flex-start;
+}
+
+.figafChatForm {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 0.75rem;
+}
+
+.figafChatLabel {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.figafChatInput {
+  min-height: 5rem;
+  resize: vertical;
+  padding: 0.75rem;
+  border: 1px solid #a9bdc4;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #18282f;
+  font: inherit;
+  box-sizing: border-box;
+}
+
+.figafChatInput:focus {
+  outline: 2px solid #0a6b5b;
+  outline-offset: 1px;
+}
+
 .figafBoolean {
   display: inline-flex;
   min-width: 3.5rem;
@@ -521,5 +620,9 @@ body {
 
   .figafLead {
     font-size: 1rem;
+  }
+
+  .figafChatForm {
+    grid-template-columns: 1fr;
   }
 }
