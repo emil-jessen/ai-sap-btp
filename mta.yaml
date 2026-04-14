@@ -30,6 +30,7 @@ modules:
       FIGAF_BASE_URL: https://emil2-figaf.cfapps.us10-001.hana.ondemand.com
       FIGAF_INTERNAL_BASE_URL: https://emil2-figaf-internal.cfapps.us10-001.hana.ondemand.com
       FIGAF_DESTINATION_NAME: figaf-api
+      OPENAI_MODEL: gpt-4.1-mini
     requires:
       - name: my-btp-app-xsuaa
       - name: my-btp-app-destination

@@ -219,6 +219,13 @@ body {
   flex: 0 0 auto;
 }
 
+.figafTableActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
 .figafTableScroll {
   overflow-x: auto;
   background: #ffffff;
@@ -397,6 +404,105 @@ body {
   color: #47626d;
   padding-left: 0.75rem;
   border-left: 3px solid #0a6b5b;
+}
+
+.figafReportOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(24, 40, 47, 0.45);
+  box-sizing: border-box;
+}
+
+.figafReportOverlay[hidden] {
+  display: none;
+}
+
+.figafReportDialog {
+  width: min(56rem, 100%);
+  max-height: min(44rem, 90vh);
+  overflow: auto;
+  padding: 1.5rem;
+  background: #ffffff;
+  border: 1px solid #d8e1e5;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.figafReportHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #d8e1e5;
+}
+
+.figafReportTitle {
+  margin: 0.25rem 0 0;
+  color: #18282f;
+  font-size: 1.5rem;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.figafReportBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 1rem;
+}
+
+.figafReportBody h3 {
+  margin: 0;
+  color: #18282f;
+  font-size: 1.1rem;
+  letter-spacing: 0;
+}
+
+.figafReportSummary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.figafReportSummary span {
+  padding: 0.35rem 0.6rem;
+  border: 1px solid #c4d8d4;
+  border-radius: 8px;
+  background: #e8f1ef;
+  color: #0a6b5b;
+  font-weight: 700;
+}
+
+.figafFindingList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.figafFindingList li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.9rem;
+  border: 1px solid #d8e1e5;
+  border-left: 4px solid #0a6b5b;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.figafFindingList span,
+.figafFindingList p {
+  margin: 0;
+  color: #47626d;
 }
 
 @media (max-width: 48rem) {

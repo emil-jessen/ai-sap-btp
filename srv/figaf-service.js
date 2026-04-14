@@ -6,6 +6,7 @@ const { executeHttpRequest } = require('@sap-cloud-sdk/http-client');
 const DEFAULT_BASE_URL = 'https://emil2-figaf.cfapps.us10-001.hana.ondemand.com';
 const DEFAULT_DESTINATION_NAME = 'figaf-api';
 const DEFAULT_AGENT_SYSTEM_ID = 'Dev-Figaf-EJE';
+const DEFAULT_OPENAI_MODEL = 'gpt-4.1-mini';
 const AGENTS_ENDPOINT = '/api/agent/search';
 const AGENTS_SEARCH_BODY = { includeDecentralAdapterEngines: true };
 const SCENARIOS_ENDPOINT = '/api/integration-object/filter';
@@ -19,6 +20,7 @@ module.exports = class FigafService extends cds.ApplicationService {
     this.on('partners', (req) => this._respond(req, () => this._readConfiguredModel('partners', req)));
     this.on('companySubsidiaries', (req) => this._respond(req, () => this._readConfiguredModel('companySubsidiaries', req)));
     this.on('scenarios', (req) => this._respond(req, () => this._readScenarios(req)));
+    this.on('aiConsistencyAnalysis', (req) => this._respond(req, () => this._aiConsistencyAnalysis(req)));
 
     return super.init();
   }
@@ -133,6 +135,157 @@ module.exports = class FigafService extends cds.ApplicationService {
         done: true
       }
     ];
+  }
+
+  async _aiConsistencyAnalysis(req) {
+    const apiKey = process.env.OPENAI_API_KEY;
+    const model = process.env.OPENAI_MODEL || DEFAULT_OPENAI_MODEL;
+
+    if (!apiKey) {
+      return {
+        configured: false,
+        model,
+        message: 'AI consistency analysis is not configured. Set OPENAI_API_KEY on my-btp-app-srv to enable the AI-assisted layer.',
+        findings: []
+      };
+    }
+
+    const input = this._parseAiPayload(req.data?.payload);
+    const response = await fetch('https://api.openai.com/v1/responses', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model,
+        temperature: 0.1,
+        input: [
+          {
+            role: 'system',
+            content: [
+              {
+                type: 'input_text',
+                text: [
+                  'You are a Figaf IS TPM consistency analyst.',
+                  'Use deterministic rule findings as the foundation and add only high-signal consistency gaps.',
+                  'Do not repeat existing rule findings.',
+                  'Validate naming, direction, sender/receiver, partner/country, MIG/MAG, Agreement, Agreement Template, status, and relationship consistency.',
+                  'Return strict JSON only with shape {"findings":[{"severity":"High|Medium|Low","rule":"...","field":"...","detail":"..."}]}.',
+                  'If there are no additional AI findings, return {"findings":[]}.'
+                ].join(' ')
+              }
+            ]
+          },
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'input_text',
+                text: JSON.stringify({
+                  namingGuideline: this._namingGuidelineSummary(),
+                  record: input
+                })
+              }
+            ]
+          }
+        ]
+      })
+    });
+
+    const text = await response.text();
+    if (!response.ok) {
+      throw new Error(`OpenAI consistency analysis failed with HTTP ${response.status}: ${text.slice(0, 300)}`);
+    }
+
+    const parsed = JSON.parse(text);
+    const outputText = this._responseOutputText(parsed);
+    const analysis = this._parseAiJson(outputText);
+
+    return {
+      configured: true,
+      model,
+      message: analysis.findings.length
+        ? `AI consistency analysis added ${analysis.findings.length} finding(s).`
+        : 'AI consistency analysis did not add any findings beyond the rule layer.',
+      findings: analysis.findings
+    };
+  }
+
+  _parseAiPayload(payload) {
+    if (!payload) {
+      return {};
+    }
+
+    try {
+      return JSON.parse(payload);
+    } catch {
+      return { rawPayload: String(payload).slice(0, 20000) };
+    }
+  }
+
+  _namingGuidelineSummary() {
+    return {
+      partnerShortName: 'lowercase first word(s) from partner name joined with underscores, followed by _<country/region ISO code>, e.g. aldi_ch',
+      identifierAlias: '[Type System] [Scheme name] [Scheme code] : [partner long name] [partner country/region full text]',
+      systemNameAlias: '[Type] [Deployment Type] [Application] [Purpose]',
+      communicationName: '[Adapter] [Direction] [incremental counter per adapter type + direction]',
+      communicationAlias: '[comm purpose description] [Adapter] [Direction]',
+      mig: '[Type System] : [Message Type] : [Type System Version] : [Envelope] : [level code] : [level title]',
+      mag: '[Source MIG] to [Target MIG], using SAP Integration Advisor proposal without redundant Mapping prefix',
+      agreementTemplate: 'b2b.<company/subsidiary short name>.<core process>.<direction>.<business object>.<typeSystem>',
+      agreement: '[Agreement Template].[partner_short_name]',
+      b2bScenario: 'optional MAG: prefix followed by MAG name',
+      hardStatusRule: 'Any status field with value Draft is inconsistent'
+    };
+  }
+
+  _responseOutputText(response) {
+    if (typeof response.output_text === 'string') {
+      return response.output_text;
+    }
+
+    return (response.output || [])
+      .flatMap((item) => item.content || [])
+      .map((content) => content.text || '')
+      .join('\n')
+      .trim();
+  }
+
+  _parseAiJson(text) {
+    const normalizedText = String(text || '')
+      .replace(/^```(?:json)?\s*/i, '')
+      .replace(/\s*```$/i, '')
+      .trim();
+
+    try {
+      const json = JSON.parse(normalizedText);
+      return {
+        findings: this._normalizeAiFindings(json.findings)
+      };
+    } catch {
+      return {
+        findings: [{
+          severity: 'Low',
+          rule: 'AI analysis parsing',
+          field: 'AI response',
+          detail: `The AI response was not valid JSON: ${String(text || '').slice(0, 500)}`
+        }]
+      };
+    }
+  }
+
+  _normalizeAiFindings(findings) {
+    if (!Array.isArray(findings)) {
+      return [];
+    }
+
+    return findings.slice(0, 20).map((finding) => ({
+      severity: ['High', 'Medium', 'Low'].includes(finding?.severity) ? finding.severity : 'Low',
+      rule: String(finding?.rule || 'AI consistency analysis').slice(0, 120),
+      field: String(finding?.field || 'Record').slice(0, 160),
+      detail: String(finding?.detail || '').slice(0, 800)
+    })).filter((finding) => finding.detail);
   }
 
   async _modelViews(req) {

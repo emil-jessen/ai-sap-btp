@@ -1,0 +1,69 @@
+Figaf SAP Integration Suite TPM Naming Convention Guidelines
+Purpose & Scope
+This document defines the Figaf naming convention for SAP Integration Suite Trading Partner Management (TPM) and related B2B integration artifacts. The goal is to ensure consistent, scalable, and maintainable naming across all environments (DEV, QA, PRD), supporting automation, transport, and governance. The conventions outlined here align with SAP Integration Suite and EDI/B2B industry best practices.
+1. Context
+SAP Integration Suite TPM manages artifacts for B2B integration, including MIGs, MAGs, Agreement Templates, Agreements, and B2B Scenarios. Each requires a clear naming policy to ensure traceability, automation, and partner lifecycle management.
+2. General Naming Principles
+Rule
+Description
+Example
+Consistency
+Follow same pattern across artifacts.
+b2b.<company>.<process>.<direction>.<object>.<standard>
+Readability
+Use lowercase; underscores for readability.
+b2b.grundfos_parent_dk.sales.out.invoice.un_edifact
+Uniqueness
+Include partner or version suffix if needed.
+…invoice.un_edifact.v001
+Environment
+Optional prefix for environment (dev, qa, prd).
+dev.b2b.…
+Versioning
+Use v### or semantic version.
+v002
+Separator
+Use '.' for major and '_' for minor separators.
+b2b.company.process_name
+3. MIG Naming Convention
+Format: [Type System] : [Message Type] : [Type System Version] : [Envelope] : [Level Code] : [Level Title]
+Standard
+Example
+UN/EDIFACT
+UN/EDIFACT : ORDERS – Purchase order message : D.96A S3 : EnvS3 : 1 : Global
+SAP S/4 IDoc
+SAP S/4HANA On Premise IDoc : ORDERS.ORDERS05 – Order : 1809 FPS02 : 1 : Global
+ASC X12
+ASC X12 : 850 – Purchase Order : 004010 : Env : 1 : Global
+4. MAG Naming Convention
+Format: [Source MIG] to [Target MIG] (remove redundant prefix 'Mapping')
+Example: UN/EDIFACT : ORDERS – Purchase order message : D.96A S3 : EnvS3 : 1 : Global to SAP S/4HANA On Premise IDoc : ORDERS.ORDERS05 – Order : 1809 FPS02 : 1 : Global
+5. Agreement Template Naming Convention
+Format: b2b.<company_or_subsidiary>.<core_process>.<direction>.<business_object>.<typeSystem>[.<standardVersion>]
+Description
+Example
+Outbound invoice (X12)
+b2b.grundfos_parent_dk.sales.out.invoice.asc_x12
+Outbound invoice (EDIFACT)
+b2b.grundfos_parent_dk.sales.out.invoice.un_edifact
+Inbound order (EANCOM)
+b2b.grundfos_parent_dk.openecx_dk.sales.inb.order.gs1_eancom
+6. Agreement Naming Convention
+Format: [Agreement Template].[partner_short_name][.v###]
+Description
+Example
+Outbound invoice – Aldi CH
+b2b.grundfos_parent_dk.sales.out.invoice.asc_x12.aldi_ch
+Outbound invoice – Amazon US
+b2b.grundfos_parent_dk.sales.out.invoice.un_edifact.amazon_us
+Inbound order – Bauhaus DE
+b2b.grundfos_parent_dk.openecx_dk.sales.inb.order.un_edifact.bauhaus_hamburg_de
+7. B2B Scenario Naming Convention
+Format: MAG: [Source MIG] to [Target MIG]
+Example: MAG: UN/EDIFACT : ORDERS – Purchase order message : D.96A S3 : EnvS3 : 1 : Global to SAP S/4HANA IDoc ORDERS05
+8. Governance & Change Management
+• Each artifact must have an assigned owner in TPM metadata.
+• Increment versions using .v###.
+• Maintain consistent names across environments (DEV/QA/PRD).
+• Retire old artifacts without reusing names.
+• Store naming metadata centrally, integrated with Figaf DevOps automation.

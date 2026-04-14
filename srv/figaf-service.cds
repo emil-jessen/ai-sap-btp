@@ -62,6 +62,20 @@ service FigafService {
     done        : Boolean;
   }
 
+  type AiFinding {
+    severity : String;
+    rule     : String;
+    field    : String;
+    detail   : String;
+  }
+
+  type AiAnalysis {
+    configured : Boolean;
+    model      : String;
+    message    : String;
+    findings   : array of AiFinding;
+  }
+
   function status() returns ConnectionStatus;
   function connectionGuide() returns array of ConnectionStep;
   function agents() returns array of FigafAgent;
@@ -69,4 +83,5 @@ service FigafService {
   function partners(agentId : String) returns array of FigafRecord;
   function companySubsidiaries(agentId : String) returns array of FigafRecord;
   function scenarios(agentId : String) returns array of FigafRecord;
+  action aiConsistencyAnalysis(payload : LargeString) returns AiAnalysis;
 }

@@ -1,0 +1,57 @@
+Figaf IS TPM Naming guidelines
+Partner short name: 
+[in lowercase: First word in full partner name (concatenate some if needed)]_[country/region ISO code]
+Identifiers alias: 
+[Type System] [Scheme name] [Scheme code] : [partner long name] [partner country/region full text]
+Systems 
+Name + Alias: [Type] [Deployment Type] [Application] [Purpose]
+Communication
+Name: [Adapter] [Direction] [incremental counter per adapter type + direction]
+Alias:  [comm purpose description] [Adapter] [Direction]
+MIG naming definition: 
+[Type System]
+[" : "]
+[Message Type]
+[" : "]
+[Type System Version]
+[" : "]
+[Envelope]
+[" : "]
+[level code]
+[" : "]
+[level titel]
+MIG Examples:
+UN/EDIFACT : ORDERS - Purchase order message : D.96A S3 : EnvS3 :1 : Global
+UN/EDIFACT : ORDERS - Purchase order message : D.96A S3 :WithoutEnv :1 : Global
+SAP S/4HANA On Premise IDoc : ORDERS.ORDERS05 - Order : 1809 FPS02 :1 : Global
+ASC X12 : 850 - Purchase Order :004010 :Env :1 : Global
+ASC X12 : 850 - Purchase Order :004010 :WithoutEnv :1 : Global
+MAG naming definition: 
+use SAP Integration Advisor proposal - but delete the redundant prefix "Mapping". 
+MAG Examples: 
+UN/EDIFACT : ORDERS - Purchase order message : D.96A S3 : EnvS3 :1 : Global to SAP S/4HANA On Premise IDoc : ORDERS.ORDERS05 - Order : 1809 FPS02 :1 : Global
+Agreement Template naming definition: see attached spreadsheet
+prefix
+company or subsidiary short name
+core process
+direction
+business object
+typeSystem
+Agreement Template naming example: see attached spreadsheet
+b2b.grundfos_parent_dk.sales.out.invoice.asc_x12
+b2b.grundfos_parent_dk.sales.out.invoice.un_edifact
+b2b.grundfos_parent_dk.openecx_dk.sales.inb.order.gs1_eancom
+b2b.grundfos_parent_dk.openecx_dk.sales.inb.order.un_edifact
+Agreement naming definition: 
+[Agreement Template]
+.[partner_short_name]
+Agreement naming example: 
+b2b.grundfos_parent_dk.sales.out.invoice.asc_x12.aldi_ch
+b2b.grundfos_parent_dk.sales.out.invoice.un_edifact.amazon_us
+b2b.grundfos_parent_dk.openecx_dk.sales.inb.order.gs1_eancom.danfoss_dk
+b2b.grundfos_parent_dk.openecx_dk.sales.inb.order.un_edifact.bauhaus_hamburg_de
+B2B Scenario naming definition: 
+["MAG: "]
+[MAG]
+B2B Scenario Examples: 
+UN/EDIFACT : ORDERS - Purchase order message : D.96A S3 : EnvS3 :1 : Global to SAP S/4HANA On Premise IDoc : ORDERS.ORDERS05 - Order : 1809 FPS02 :1 : Global
