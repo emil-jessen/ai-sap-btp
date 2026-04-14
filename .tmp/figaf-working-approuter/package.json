@@ -1,0 +1,11 @@
+{
+  "name": "figaf-tpm-approuter",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node start.js"
+  },
+  "dependencies": {
+    "@sap/approuter": "^16.7.3"
+  }
+}

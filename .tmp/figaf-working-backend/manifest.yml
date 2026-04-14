@@ -1,0 +1,13 @@
+---
+applications:
+  - name: figaf-tpm-guide-backend
+    memory: 256M
+    instances: 1
+    buildpacks:
+      - nodejs_buildpack
+    services:
+      - figaf-tpm-xsuaa
+      - figaf-destination
+    env:
+      AUTH_REQUIRED: "true"
+      FIGAF_DESTINATION_NAME: figaf-api

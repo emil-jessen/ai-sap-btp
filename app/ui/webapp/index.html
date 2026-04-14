@@ -1,25 +1,631 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My BTP App</title>
-
-  <script id="sap-ui-bootstrap"
-    src="https://ui5.sap.com/1.120.0/resources/sap-ui-core.js"
-    data-sap-ui-theme="sap_fiori_3"
-    data-sap-ui-resourceroots='{"mybtpappui": "./"}'
-    data-sap-ui-compatversion="edge"
-    data-sap-ui-async="true"
-    data-sap-ui-frameOptions="trusted"
-    data-sap-ui-oninit="module:sap/ui/core/ComponentSupport">
-  </script>
+  <title>Figaf AI Analysis</title>
+  <link rel="stylesheet" href="./css/style.css" />
 </head>
-<body class="sapUiBody" id="content">
-  <div data-sap-ui-component
-       data-name="mybtpappui"
-       data-id="container"
-       data-settings='{"id": "myBTPApp"}'>
-  </div>
+<body>
+  <main class="figafShell">
+    <section class="figafHero" aria-labelledby="page-title">
+      <div class="figafHeroCopy">
+        <p class="figafEyebrow">Figaf AI analysis</p>
+        <h1 id="page-title" class="figafTitle">Find weak spots in B2B master data before they reach production.</h1>
+        <p class="figafLead">
+          Run AI-assisted consistency checks across partners, company subsidiaries, and scenarios from the Figaf Test Tool landscape.
+        </p>
+      </div>
+      <div class="figafHeroVisual">
+        <img
+          src="https://figaf.com/wp-content/uploads/2025/11/2510-Release-1024x536.png"
+          alt="Figaf B2B overview"
+          class="figafHeroImage" />
+        <p class="figafImageCaption">B2B landscape readiness</p>
+      </div>
+    </section>
+
+    <section class="figafSection" aria-labelledby="scope-title">
+      <p class="figafEyebrow">Choose analysis scope</p>
+      <h2 id="scope-title" class="figafSectionTitle">Start with the data model that carries the most risk.</h2>
+      <div class="figafLivePanel" aria-live="polite">
+        <div class="figafConnectionSummary">
+          <strong class="figafChecklistTitle">Figaf connection</strong>
+          <p id="figafConnectionStatus" class="figafBodyText">Not checked yet.</p>
+        </div>
+        <label class="figafAgentField" for="figafAgentSelect">
+          <span>Agent</span>
+          <select id="figafAgentSelect" class="figafSelect">
+            <option value="">Default agent</option>
+          </select>
+        </label>
+      </div>
+      <div class="figafCards">
+        <article class="figafCard">
+          <span class="figafCardIcon" aria-hidden="true">P</span>
+          <h3 class="figafCardTitle">Partners</h3>
+          <p class="figafCardText">Detect duplicate partner identities, missing communication partners, inconsistent identifiers, and naming drift.</p>
+          <button class="figafButton figafCardButton" type="button" data-model-function="partners">Read partners</button>
+        </article>
+        <article class="figafCard">
+          <span class="figafCardIcon" aria-hidden="true">C</span>
+          <h3 class="figafCardTitle">Company/subsidiaries</h3>
+          <p class="figafCardText">Check subsidiary identifiers, qualifier usage, communication setup, and parent-company alignment.</p>
+          <button class="figafButton figafCardButton" type="button" data-model-function="companySubsidiaries">Read subsidiaries</button>
+        </article>
+        <article class="figafCard">
+          <span class="figafCardIcon" aria-hidden="true">S</span>
+          <h3 class="figafCardTitle">Scenarios</h3>
+          <p class="figafCardText">Review scenario coverage, agreement update states, missing links, and migration readiness signals.</p>
+          <button class="figafButton figafCardButton" type="button" data-model-function="scenarios">Read scenarios</button>
+        </article>
+      </div>
+      <div id="figafDataTable" class="figafTableRegion" aria-live="polite"></div>
+    </section>
+
+    <section class="figafRoadmap" aria-labelledby="roadmap-title">
+      <div class="figafRoadmapText">
+        <p class="figafEyebrow">Next integration step</p>
+        <h2 id="roadmap-title" class="figafSectionTitle">
+          Connect to the Figaf tenant API, normalize the three models, then ask the AI to explain mismatches.
+        </h2>
+        <p class="figafBodyText">
+          The connector now uses the Figaf WebUI API calls captured from the B2B screens for scenarios, partners,
+          and company/subsidiaries.
+        </p>
+      </div>
+      <div class="figafChecklist">
+        <strong class="figafChecklistTitle">Planned checks</strong>
+        <span class="figafChecklistItem">Partner and subsidiary identifier collisions</span>
+        <span class="figafChecklistItem">Missing communication channel assignments</span>
+        <span class="figafChecklistItem">Scenario references to inactive or incomplete objects</span>
+        <span class="figafChecklistItem">Migration readiness and test coverage gaps</span>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    var entityColumns = [
+      "Type",
+      "Name",
+      "Short Name",
+      "URL",
+      "Country/Region Code",
+      "Created By",
+      "Created Date",
+      "Last Modified By",
+      "Last Modified Date"
+    ];
+
+    var scenarioColumns = [
+      "Technical Name",
+      "Displayed Name",
+      "Agreement",
+      "Trading Partner",
+      "Trading Partner Country/Region Code",
+      "Communication Partner",
+      "Communication Partner Country/Region Code",
+      "Company/Subsidiary",
+      "Company/Subsidiary Country/Region Code",
+      "Activated",
+      "Update Status",
+      "Recordings",
+      "Agent Test Cases",
+      "Linked Test Cases",
+      "MAG",
+      "MAG Status",
+      "MAG Version",
+      "Main Flow",
+      "Main Flow Runtime Status",
+      "Main Flow Runtime Version",
+      "Main Flow Design Version",
+      "Direction",
+      "Sender",
+      "Receiver",
+      "Sender Communication",
+      "Sender System Purpose",
+      "Sender Adapter Type",
+      "Sender Document Standard",
+      "Sender Message Type",
+      "Sender Message Version",
+      "Sender Archive Payload",
+      "Sender Identifier on Sender side",
+      "Sender Identifier Qualifier on Sender side",
+      "Receiver Identifier on Sender side",
+      "Receiver Identifier Qualifier on Sender side",
+      "Sender Identifier on Receiver side",
+      "Sender Identifier Qualifier on Receiver side",
+      "Receiver Identifier on Receiver side",
+      "Receiver Identifier Qualifier on Receiver side",
+      "Receiver Communication",
+      "Receiver System Purpose",
+      "Receiver Adapter Type",
+      "Receiver Document Standard",
+      "Receiver Message Type",
+      "Receiver Message Version",
+      "Receiver Archive Payload",
+      "Pre Flow",
+      "Pre Flow Runtime Status",
+      "Pre Flow Runtime Version",
+      "Pre Flow Design Version",
+      "Post Flow",
+      "Post Flow Runtime Status",
+      "Post Flow Runtime Version",
+      "Post Flow Design Version",
+      "Sender MIG",
+      "Sender MIG Status",
+      "Sender MIG Version",
+      "Receiver MIG",
+      "Receiver MIG Status",
+      "Receiver MIG Version",
+      "Partner Directory",
+      "Agreement Template",
+      "Last Sync Date",
+      "Modification Date"
+    ];
+    var AUTH_REFRESH_MESSAGE = "Your BTP app session needs to be refreshed. Sign in again, then retry the Figaf read.";
+
+    async function readJson(url) {
+      var response = await fetch(url, {
+        headers: { "Accept": "application/json" },
+        credentials: "same-origin",
+        cache: "no-store"
+      });
+      var text = await response.text();
+      var contentType = response.headers.get("content-type") || "";
+
+      if (contentType.indexOf("text/html") !== -1 || text.trim().indexOf("<html") === 0) {
+        if (text.indexOf("/oauth/authorize") !== -1 || text.indexOf("locationAfterLogin") !== -1) {
+          var authError = new Error(AUTH_REFRESH_MESSAGE);
+          authError.signInUrl = extractSignInUrl(text);
+          throw authError;
+        }
+
+        throw new Error("The service returned an HTML page instead of JSON.");
+      }
+
+      if (!response.ok) {
+        throw new Error(readErrorMessage(response.status, text));
+      }
+
+      try {
+        return JSON.parse(text);
+      } catch (error) {
+        throw new Error("The response was not JSON.");
+      }
+    }
+
+    function readErrorMessage(status, text) {
+      try {
+        var payload = JSON.parse(text);
+        if (payload && payload.error && payload.error.message) {
+          return payload.error.message;
+        }
+      } catch (error) {
+        // Keep the original text below when the response is not an OData error.
+      }
+
+      return "HTTP " + status + ": " + text.slice(0, 220);
+    }
+
+    function extractSignInUrl(html) {
+      var match = html.match(/location="([^"]+)"/);
+      if (!match || !match[1]) {
+        return "";
+      }
+
+      var textarea = document.createElement("textarea");
+      textarea.innerHTML = match[1];
+      return textarea.value;
+    }
+
+    function isAuthRefreshError(error) {
+      return error && error.message === AUTH_REFRESH_MESSAGE;
+    }
+
+    function setConnectionStatus(message, signInUrl) {
+      var status = document.getElementById("figafConnectionStatus");
+      status.textContent = message;
+
+      if (signInUrl) {
+        var action = document.createElement("button");
+        action.className = "figafInlineButton";
+        action.type = "button";
+        action.textContent = "Refresh sign-in";
+        action.addEventListener("click", function () {
+          window.location.href = signInUrl;
+        });
+        status.appendChild(document.createTextNode(" "));
+        status.appendChild(action);
+      }
+    }
+
+    function signInUrlFor(error) {
+      return isAuthRefreshError(error) ? error.signInUrl || "" : "";
+    }
+
+    function selectedAgentId() {
+      var select = document.getElementById("figafAgentSelect");
+      return select ? select.value : "";
+    }
+
+    function odataString(value) {
+      return encodeURIComponent(String(value || "").replace(/'/g, "''"));
+    }
+
+    function figafFunctionUrl(name) {
+      var agentId = selectedAgentId();
+      return agentId
+        ? "/figaf/" + name + "(agentId='" + odataString(agentId) + "')"
+        : "/figaf/" + name + "()";
+    }
+
+    function endpointTitle(name) {
+      if (name === "partners") {
+        return "Partners";
+      }
+      if (name === "companySubsidiaries") {
+        return "Company/subsidiaries";
+      }
+      return "Scenarios";
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function parseRaw(record) {
+      try {
+        return record && record.raw ? JSON.parse(record.raw) : {};
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function parseJson(value) {
+      try {
+        return value ? JSON.parse(value) : {};
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function formatDate(value) {
+      if (!value) {
+        return "";
+      }
+
+      var date = typeof value === "number" || /^\d+$/.test(String(value))
+        ? new Date(Number(value))
+        : new Date(value);
+
+      if (Number.isNaN(date.getTime())) {
+        return String(value);
+      }
+
+      return new Intl.DateTimeFormat("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false
+      }).format(date).replace(",", "");
+    }
+
+    function yesNo(value) {
+      if (value === true) {
+        return "yes";
+      }
+      if (value === false) {
+        return "no";
+      }
+      return value || "";
+    }
+
+    function metadataName(metadata) {
+      if (!metadata) {
+        return "";
+      }
+      if (typeof metadata === "string") {
+        return metadata;
+      }
+      return metadata.name || metadata.displayedName || metadata.technicalName || metadata.title || "";
+    }
+
+    function metadataStatus(metadata) {
+      if (!metadata || typeof metadata === "string") {
+        return "";
+      }
+      return metadata.status || metadata.updateStatus || metadata.runtimeStatus || "";
+    }
+
+    function metadataVersion(metadata) {
+      if (!metadata || typeof metadata === "string") {
+        return "";
+      }
+      return metadata.version || metadata.runtimeVersion || metadata.designVersion || "";
+    }
+
+    function entityRow(record) {
+      var raw = parseRaw(record);
+
+      return {
+        "Type": raw.trackedObjectType || record.objectType,
+        "Name": raw.name || record.name,
+        "Short Name": raw.shortName || record.technicalName,
+        "URL": raw.url,
+        "Country/Region Code": raw.country,
+        "Created By": raw.createdBy,
+        "Created Date": formatDate(raw.createdDate),
+        "Last Modified By": raw.lastModifiedBy,
+        "Last Modified Date": formatDate(raw.lastModifiedDate || record.modifiedAt)
+      };
+    }
+
+    function scenarioRow(record) {
+      var raw = parseRaw(record);
+      var objectData = raw.objectData || {};
+      var additionalData = parseJson(objectData.additionalData);
+      var b2b = additionalData.b2BScenarioObjectData || {};
+      var recordings = raw.recordingRequestsCount || 0;
+      var senderMig = b2b.senderMigMetadata || {};
+      var receiverMig = b2b.receiverMigMetadata || {};
+      var mag = b2b.magMetadata || {};
+
+      return {
+        "Technical Name": objectData.technicalName || raw.hash || record.technicalName,
+        "Displayed Name": objectData.displayedName || raw.title || record.name,
+        "Agreement": b2b.agreementName || raw.title || record.name,
+        "Trading Partner": b2b.tradingPartnerName,
+        "Trading Partner Country/Region Code": b2b.tradingPartnerCountry,
+        "Communication Partner": b2b.communicationPartnerName,
+        "Communication Partner Country/Region Code": b2b.communicationPartnerCountry,
+        "Company/Subsidiary": b2b.companyOrSubsidiaryName,
+        "Company/Subsidiary Country/Region Code": b2b.companyOrSubsidiaryCountry,
+        "Activated": yesNo(b2b.activated),
+        "Update Status": b2b.updateStatus,
+        "Recordings": recordings,
+        "Agent Test Cases": raw.agentTestCasesCount || 0,
+        "Linked Test Cases": raw.linkedTestCasesCount || 0,
+        "MAG": metadataName(mag),
+        "MAG Status": b2b.magStatus || metadataStatus(mag),
+        "MAG Version": metadataVersion(mag),
+        "Main Flow": objectData.technicalName,
+        "Main Flow Runtime Status": objectData.iflowRuntimeData && objectData.iflowRuntimeData.status,
+        "Main Flow Runtime Version": objectData.iflowRuntimeData && objectData.iflowRuntimeData.version,
+        "Main Flow Design Version": objectData.version,
+        "Direction": b2b.direction,
+        "Sender": b2b.initiator,
+        "Receiver": b2b.reactor,
+        "Sender Communication": metadataName(b2b.senderCommunicationChannelMetadata),
+        "Sender System Purpose": b2b.senderSystemPurpose,
+        "Sender Adapter Type": b2b.senderAdapterType,
+        "Sender Document Standard": b2b.senderDocumentStandard,
+        "Sender Message Type": b2b.senderMessageType,
+        "Sender Message Version": b2b.senderMessageVersion,
+        "Sender Archive Payload": yesNo(b2b.senderPayloadArchived),
+        "Sender Identifier on Sender side": b2b.initiatorSenderId,
+        "Sender Identifier Qualifier on Sender side": b2b.initiatorSenderQualifier,
+        "Receiver Identifier on Sender side": b2b.initiatorReceiverId,
+        "Receiver Identifier Qualifier on Sender side": b2b.initiatorReceiverQualifier,
+        "Sender Identifier on Receiver side": b2b.reactorSenderId,
+        "Sender Identifier Qualifier on Receiver side": b2b.reactorSenderQualifier,
+        "Receiver Identifier on Receiver side": b2b.reactorReceiverId,
+        "Receiver Identifier Qualifier on Receiver side": b2b.reactorReceiverQualifier,
+        "Receiver Communication": metadataName(b2b.receiverCommunicationChannelMetadata),
+        "Receiver System Purpose": b2b.receiverSystemPurpose,
+        "Receiver Adapter Type": b2b.receiverAdapterType,
+        "Receiver Document Standard": b2b.receiverDocumentStandard,
+        "Receiver Message Type": b2b.receiverMessageType,
+        "Receiver Message Version": b2b.receiverMessageVersion,
+        "Receiver Archive Payload": yesNo(b2b.receiverPayloadArchived),
+        "Pre Flow": metadataName(b2b.preFlowMetadata),
+        "Pre Flow Runtime Status": metadataStatus(b2b.preFlowMetadata),
+        "Pre Flow Runtime Version": metadataVersion(b2b.preFlowMetadata),
+        "Pre Flow Design Version": "",
+        "Post Flow": metadataName(b2b.postFlowMetadata),
+        "Post Flow Runtime Status": metadataStatus(b2b.postFlowMetadata),
+        "Post Flow Runtime Version": metadataVersion(b2b.postFlowMetadata),
+        "Post Flow Design Version": "",
+        "Sender MIG": metadataName(senderMig),
+        "Sender MIG Status": b2b.senderMigStatus || metadataStatus(senderMig),
+        "Sender MIG Version": metadataVersion(senderMig),
+        "Receiver MIG": metadataName(receiverMig),
+        "Receiver MIG Status": b2b.receiverMigStatus || metadataStatus(receiverMig),
+        "Receiver MIG Version": metadataVersion(receiverMig),
+        "Partner Directory": b2b.pdPartner,
+        "Agreement Template": b2b.agreementTemplateName,
+        "Last Sync Date": formatDate(raw.lastSynchronizationDate),
+        "Modification Date": formatDate(objectData.modificationDate || record.modifiedAt),
+        "Inconsistencies detected": false,
+        "See analysis": "/mybtpappui/index.html#analysis/" + encodeURIComponent(raw.id || record.id || "")
+      };
+    }
+
+    function renderTable(title, records, columns, options) {
+      var container = document.getElementById("figafDataTable");
+      var allColumns = options && options.allColumns ? options.allColumns : columns;
+      var rows = records.value.map(options.rowMapper);
+      var showAll = options && options.showAll;
+      var visibleColumns = showAll ? allColumns : columns;
+      var tableId = "figafTable-" + title.replace(/[^a-z0-9]/gi, "");
+      var button = "";
+
+      if (options && options.canToggle) {
+        button = "<button class=\"figafButton figafTableToggle\" type=\"button\" data-table-title=\"" +
+          escapeHtml(title) + "\" data-show-all=\"" + (showAll ? "false" : "true") + "\">" +
+          (showAll ? "Show default columns" : "Display all columns") +
+          "</button>";
+      }
+
+      var header = visibleColumns.map(function (column) {
+        return "<th scope=\"col\">" + escapeHtml(column) + "</th>";
+      }).join("");
+      var filters = visibleColumns.map(function (column, index) {
+        return "<th scope=\"col\">" +
+          "<label class=\"figafColumnFilterLabel\">" +
+            "<span>Filter " + escapeHtml(column) + "</span>" +
+            "<input class=\"figafColumnFilter\" type=\"search\" data-filter-index=\"" + index + "\" placeholder=\"Filter\" />" +
+          "</label>" +
+        "</th>";
+      }).join("");
+      var body = rows.map(function (row) {
+        var cells = visibleColumns.map(function (column) {
+          var value = row[column];
+          if (column === "See analysis") {
+            return "<td><a href=\"" + escapeHtml(value) + "\">Open GAP report</a></td>";
+          }
+          if (column === "Inconsistencies detected") {
+            return "<td><span class=\"figafBoolean\">" + escapeHtml(value ? "true" : "false") + "</span></td>";
+          }
+          return "<td>" + escapeHtml(value) + "</td>";
+        }).join("");
+        return "<tr>" + cells + "</tr>";
+      }).join("");
+
+      container.innerHTML =
+        "<div class=\"figafTableHeader\">" +
+          "<div><strong class=\"figafChecklistTitle\">" + escapeHtml(title) + "</strong>" +
+          "<p class=\"figafBodyText\">" + rows.length + " records</p></div>" +
+          button +
+        "</div>" +
+        "<div class=\"figafTableScroll\" id=\"" + tableId + "\">" +
+          "<table class=\"figafDataGrid\"><thead><tr>" + header + "</tr><tr class=\"figafFilterRow\">" + filters + "</tr></thead><tbody>" + body + "</tbody></table>" +
+        "</div>";
+    }
+
+    function applyColumnFilters(table) {
+      var filters = Array.from(table.querySelectorAll(".figafColumnFilter")).map(function (input) {
+        return {
+          index: Number(input.getAttribute("data-filter-index")),
+          value: input.value.trim().toLowerCase()
+        };
+      }).filter(function (filter) {
+        return filter.value;
+      });
+
+      Array.from(table.querySelectorAll("tbody tr")).forEach(function (row) {
+        var visible = filters.every(function (filter) {
+          var cell = row.children[filter.index];
+          return cell && cell.textContent.toLowerCase().indexOf(filter.value) !== -1;
+        });
+        row.hidden = !visible;
+      });
+    }
+
+    function renderRecords(modelName, records, showAll) {
+      if (modelName === "partners") {
+        renderTable("Partners", records, entityColumns, {
+          rowMapper: entityRow
+        });
+        return;
+      }
+
+      if (modelName === "companySubsidiaries") {
+        renderTable("Company/subsidiaries", records, entityColumns, {
+          rowMapper: entityRow
+        });
+        return;
+      }
+
+      renderTable("Scenarios", records, ["Agreement", "Inconsistencies detected", "See analysis"], {
+        allColumns: scenarioColumns.concat(["Inconsistencies detected", "See analysis"]),
+        canToggle: true,
+        rowMapper: scenarioRow,
+        showAll: showAll
+      });
+    }
+
+    function renderAgents(agents) {
+      var select = document.getElementById("figafAgentSelect");
+      var current = select.value;
+      var options = ["<option value=\"\">Default agent</option>"];
+
+      agents.value.forEach(function (agent) {
+        var label = agent.systemId || agent.name || agent.id;
+        var value = agent.id || agent.guid || agent.systemId || agent.name;
+        options.push("<option value=\"" + escapeHtml(value) + "\">" + escapeHtml(label) + "</option>");
+      });
+
+      select.innerHTML = options.join("");
+      if (current) {
+        select.value = current;
+      }
+    }
+
+    async function loadFigafAgents() {
+      setConnectionStatus("Reading Figaf agents...");
+
+      try {
+        var agents = await readJson("/figaf/agents()");
+        renderAgents(agents);
+        setConnectionStatus(agents.value.length
+          ? "Loaded " + agents.value.length + " Figaf agents."
+          : "No Figaf agents were returned.");
+        return true;
+      } catch (error) {
+        setConnectionStatus(
+          "Could not load Figaf agents: " + error.message,
+          signInUrlFor(error)
+        );
+        return false;
+      }
+    }
+
+    document.getElementById("figafAgentSelect").addEventListener("change", function () {
+      var select = document.getElementById("figafAgentSelect");
+      var label = select.options[select.selectedIndex] ? select.options[select.selectedIndex].text : "Default agent";
+      setConnectionStatus("Ready to read Figaf data for " + label + ".");
+    });
+
+    document.addEventListener("click", function (event) {
+      var modelName = event.target.getAttribute("data-model-function");
+
+      if (modelName) {
+        var endpoint = figafFunctionUrl(modelName);
+        setConnectionStatus("Reading " + endpointTitle(modelName) + "...");
+        readJson(endpoint)
+          .then(function (records) {
+            setConnectionStatus("Read " + records.value.length + " records from " + endpointTitle(modelName) + ".");
+            renderRecords(modelName, records, false);
+          })
+          .catch(function (error) {
+            setConnectionStatus(error.message, signInUrlFor(error));
+          });
+      }
+
+      if (event.target.getAttribute("data-table-title") === "Scenarios") {
+        readJson(figafFunctionUrl("scenarios"))
+          .then(function (records) {
+            renderRecords("scenarios", records, event.target.getAttribute("data-show-all") === "true");
+          })
+          .catch(function (error) {
+            setConnectionStatus(error.message, signInUrlFor(error));
+          });
+      }
+    });
+
+    document.addEventListener("input", function (event) {
+      if (!event.target.classList.contains("figafColumnFilter")) {
+        return;
+      }
+
+      var table = event.target.closest("table");
+      if (table) {
+        applyColumnFilters(table);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      loadFigafAgents();
+    });
+  </script>
 </body>
 </html>

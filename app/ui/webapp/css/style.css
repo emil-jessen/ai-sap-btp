@@ -1,0 +1,419 @@
+.figafPage {
+  background: #f5f7f8;
+}
+
+body {
+  margin: 0;
+  background: #f5f7f8;
+  color: #18282f;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.figafShell {
+  min-height: 100vh;
+  padding: 2rem;
+  gap: 1.75rem;
+  box-sizing: border-box;
+}
+
+.figafHero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 31rem;
+  padding: 3rem;
+  gap: 2rem;
+  background: #ffffff;
+  border: 1px solid #d8e1e5;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.figafHeroCopy {
+  display: flex;
+  flex-direction: column;
+  max-width: 43rem;
+  gap: 1rem;
+}
+
+.figafEyebrow {
+  margin: 0;
+  color: #0a6b5b;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.figafTitle {
+  margin: 0;
+  color: #18282f;
+  font-size: 3rem;
+  line-height: 1.08;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.figafLead {
+  margin: 0;
+  max-width: 40rem;
+  color: #47626d;
+  font-size: 1.125rem;
+  line-height: 1.55;
+}
+
+.figafButton {
+  min-height: 2.5rem;
+  padding: 0.55rem 1rem;
+  border: 1px solid #0a6b5b;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #0a6b5b;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.figafButtonPrimary {
+  background: #0a6b5b;
+  color: #ffffff;
+}
+
+.figafButton:hover {
+  background: #e8f1ef;
+}
+
+.figafButtonPrimary:hover {
+  background: #09584b;
+}
+
+.figafInlineButton {
+  min-height: 2rem;
+  margin-left: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid #0a6b5b;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #0a6b5b;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.figafInlineButton:hover {
+  background: #e8f1ef;
+}
+
+.figafPrimaryButton .sapMBtnInner {
+  border-radius: 8px;
+}
+
+.figafHeroVisual {
+  display: flex;
+  flex-direction: column;
+  width: 28rem;
+  max-width: 100%;
+  gap: 0.75rem;
+}
+
+.figafHeroImage {
+  width: 100%;
+  max-width: 28rem;
+  border-radius: 8px;
+  border: 1px solid #d8e1e5;
+  background: #ffffff;
+}
+
+.figafImageCaption {
+  margin: 0;
+  color: #5b7078;
+  font-size: 0.875rem;
+}
+
+.figafSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.figafSectionTitle {
+  margin: 0;
+  max-width: 48rem;
+  color: #18282f;
+  font-size: 2rem;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.figafCards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.figafLivePanel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: #ffffff;
+  border: 1px solid #d8e1e5;
+  border-radius: 8px;
+}
+
+.figafConnectionSummary {
+  min-width: 16rem;
+  flex: 1 1 24rem;
+}
+
+.figafLivePanel p {
+  margin-top: 0.35rem;
+}
+
+.figafAgentField {
+  display: flex;
+  flex-direction: column;
+  min-width: 14rem;
+  gap: 0.35rem;
+  color: #18282f;
+  font-weight: 700;
+}
+
+.figafSelect {
+  min-height: 2.5rem;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid #a9bdc4;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #18282f;
+  font: inherit;
+}
+
+.figafTableRegion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.figafTableHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  background: #ffffff;
+  border: 1px solid #d8e1e5;
+  border-radius: 8px;
+}
+
+.figafTableHeader p {
+  margin-top: 0.35rem;
+}
+
+.figafTableToggle {
+  flex: 0 0 auto;
+}
+
+.figafTableScroll {
+  overflow-x: auto;
+  background: #ffffff;
+  border: 1px solid #d8e1e5;
+  border-radius: 8px;
+}
+
+.figafDataGrid {
+  width: 100%;
+  min-width: 48rem;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.figafDataGrid th,
+.figafDataGrid td {
+  max-width: 22rem;
+  padding: 0.75rem;
+  border-bottom: 1px solid #d8e1e5;
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.figafDataGrid th {
+  position: sticky;
+  top: 0;
+  background: #eef5f3;
+  color: #18282f;
+  font-weight: 700;
+}
+
+.figafFilterRow th {
+  top: 2.75rem;
+  background: #ffffff;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.figafColumnFilterLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 9rem;
+}
+
+.figafColumnFilterLabel span {
+  color: #47626d;
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+.figafColumnFilter {
+  width: 100%;
+  min-height: 2rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid #a9bdc4;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #18282f;
+  font: inherit;
+  box-sizing: border-box;
+}
+
+.figafColumnFilter:focus {
+  outline: 2px solid #0a6b5b;
+  outline-offset: 1px;
+}
+
+.figafDataGrid tr:last-child td {
+  border-bottom: 0;
+}
+
+.figafDataGrid a {
+  color: #0a6b5b;
+  font-weight: 700;
+}
+
+.figafBoolean {
+  display: inline-flex;
+  min-width: 3.5rem;
+  justify-content: center;
+  padding: 0.2rem 0.45rem;
+  border: 1px solid #c4d8d4;
+  border-radius: 8px;
+  background: #e8f1ef;
+  color: #0a6b5b;
+  font-weight: 700;
+}
+
+.figafCard {
+  display: flex;
+  flex-direction: column;
+  min-height: 17rem;
+  min-width: 16rem;
+  flex: 1 1 18rem;
+  padding: 1.5rem;
+  gap: 0.75rem;
+  background: #ffffff;
+  border: 1px solid #d8e1e5;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.figafCardIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  color: #0a6b5b;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.figafCardTitle {
+  margin: 0;
+  color: #18282f;
+  font-size: 1.35rem;
+  letter-spacing: 0;
+}
+
+.figafCardText,
+.figafBodyText {
+  margin: 0;
+  color: #47626d;
+  line-height: 1.5;
+}
+
+.figafCardButton {
+  margin-top: auto;
+  align-self: flex-start;
+}
+
+.figafCardButton .sapMBtnInner {
+  border-radius: 8px;
+}
+
+.figafRoadmap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 1rem;
+  padding: 2rem;
+  background: #e8f1ef;
+  border: 1px solid #c4d8d4;
+  border-radius: 8px;
+}
+
+.figafRoadmapText {
+  display: flex;
+  flex-direction: column;
+  flex: 2 1 24rem;
+  gap: 0.75rem;
+}
+
+.figafChecklist {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 18rem;
+  gap: 0.65rem;
+  padding: 1.25rem;
+  background: #ffffff;
+  border: 1px solid #c4d8d4;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.figafChecklistTitle {
+  color: #18282f;
+  font-weight: 700;
+}
+
+.figafChecklistItem {
+  display: block;
+  color: #47626d;
+  padding-left: 0.75rem;
+  border-left: 3px solid #0a6b5b;
+}
+
+@media (max-width: 48rem) {
+  .figafShell {
+    padding: 1rem;
+  }
+
+  .figafHero,
+  .figafRoadmap {
+    padding: 1.25rem;
+  }
+
+  .figafTitle {
+    font-size: 2.25rem;
+  }
+
+  .figafLead {
+    font-size: 1rem;
+  }
+}

@@ -10,9 +10,16 @@
     {
       "name": "$XSAPPNAME.Admin",
       "description": "Full CRUD access to all Items"
+    },
+    {
+      "name": "uaa.user",
+      "description": "Required for OAuth2 user-token exchange through the Destination service"
     }
   ],
   "attributes": [],
+  "foreign-scope-references": [
+    "$XSAPPNAME(application,figaf-xsuaa).ROLE_IRTAdmin"
+  ],
   "role-templates": [
     {
       "name": "Viewer",
@@ -30,6 +37,16 @@
         "$XSAPPNAME.Admin"
       ],
       "attribute-references": []
+    },
+    {
+      "name": "FigafConnector",
+      "description": "Allows this app to request Figaf user-token exchange scopes",
+      "scope-references": [
+        "$XSAPPNAME.Viewer",
+        "uaa.user",
+        "$XSAPPNAME(application,figaf-xsuaa).ROLE_IRTAdmin"
+      ],
+      "attribute-references": []
     }
   ],
   "role-collections": [
@@ -45,6 +62,13 @@
       "description": "Admin role collection for My BTP App",
       "role-template-references": [
         "$XSAPPNAME.Admin"
+      ]
+    },
+    {
+      "name": "MyBTPApp_FigafConnector",
+      "description": "Figaf user-token exchange role collection for My BTP App",
+      "role-template-references": [
+        "$XSAPPNAME.FigafConnector"
       ]
     }
   ],

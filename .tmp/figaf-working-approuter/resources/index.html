@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Figaf TPM Partner Onboarding Guide</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { --bg:#f8fafc; --card:#fff; --line:#e2e8f0; --text:#0f172a; --muted:#64748b; --accent:#0f172a; --ok:#166534; --okbg:#dcfce7; --err:#991b1b; --errbg:#fee2e2; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family: Inter, system-ui, Arial, sans-serif; color:var(--text); background:var(--bg); }
+    .page { max-width: 1600px; margin: 0 auto; padding: 24px; }
+    .header, .card { background: var(--card); border:1px solid var(--line); border-radius: 20px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+    .header { padding: 24px; margin-bottom: 18px; }
+    h1,h2,h3,h4 { margin:0; }
+    .muted { color: var(--muted); } .small { font-size: 12px; }
+    .badge { display:inline-flex; align-items:center; gap:6px; border:1px solid var(--line); border-radius:999px; padding:6px 10px; background:#fff; font-size:12px; }
+    .pillrow { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+    .grid { display:grid; gap:18px; grid-template-columns: 280px minmax(760px,1fr) 380px; }
+    .card { padding: 18px; }
+    .steps { display:flex; flex-direction:column; gap:10px; }
+    .step { padding:12px; border:1px solid var(--line); border-radius: 14px; cursor:pointer; background:#fff; }
+    .step.active { border-color: var(--accent); }
+    .section-title { margin-bottom: 10px; }
+    .subgrid { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:14px; }
+    .subgrid3 { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:14px; }
+    .full { grid-column: 1 / -1; }
+    label { display:block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color:#334155; }
+    input, select, textarea { width:100%; border:1px solid var(--line); border-radius:12px; padding:10px 12px; font:inherit; background:#fff; }
+    textarea { min-height: 100px; resize: vertical; }
+    .fieldhelp { font-size:11px; color:var(--muted); margin-top:4px; }
+    .row { display:flex; gap:10px; flex-wrap:wrap; }
+    .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top: 12px; }
+    button { border:1px solid var(--line); background:#fff; border-radius:12px; padding:10px 14px; cursor:pointer; font:inherit; }
+    button.primary { background: var(--accent); color:#fff; border-color: var(--accent); }
+    button:disabled { opacity:.5; cursor:not-allowed; }
+    .alert { padding:12px 14px; border-radius:12px; margin-bottom: 14px; display:none; white-space: pre-wrap; }
+    .alert.error { background:var(--errbg); color:var(--err); }
+    .alert.success { background:var(--okbg); color:var(--ok); }
+    .pre { white-space: pre-wrap; word-break: break-word; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; background:#f8fafc; border:1px solid var(--line); border-radius:14px; padding:12px; }
+    .proposal { border:1px solid var(--line); border-radius:14px; padding:10px; margin-top:10px; background:#fff; }
+    .checks { margin:0; padding-left: 18px; }
+    .statusgrid { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:10px; margin-top:14px; }
+    .stat { border:1px solid var(--line); border-radius:14px; padding:10px; background:#fff; }
+    @media (max-width: 1280px) { .grid { grid-template-columns:1fr; } .subgrid,.subgrid3 { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      <h1>Figaf TPM Partner Onboarding Guide</h1>
+      <div class="muted" style="margin-top:6px;">Guide users through TPM partner onboarding with live Figaf lookups, helper validation, and a fuller partner-create form.</div>
+      <div class="pillrow">
+        <span class="badge" id="status-pill">Backend: checking…</span>
+        <span class="badge" id="user-pill">User: checking…</span>
+        <span class="badge">Flow: Agent → Company / Subsidiary → Agreement Template → Partner details</span>
+      </div>
+    </div>
+
+    <div id="error-box" class="alert error"></div>
+    <div id="success-box" class="alert success"></div>
+
+    <div class="grid">
+      <div class="card">
+        <h3 class="section-title">Steps</h3>
+        <div class="steps" id="steps"></div>
+      </div>
+
+      <div class="card">
+        <div class="row" style="justify-content:space-between; align-items:center;">
+          <div>
+            <h2 id="step-title">Collect onboarding context</h2>
+            <div class="muted" id="step-purpose" style="margin-top:4px;"></div>
+          </div>
+          <div class="badge" id="progress-pill">Step 1 / 4</div>
+        </div>
+
+        <div class="statusgrid">
+          <div class="stat"><div class="small muted">Agent</div><div id="current-agent">—</div></div>
+          <div class="stat"><div class="small muted">Company / Subsidiary</div><div id="current-entity">—</div></div>
+          <div class="stat"><div class="small muted">Agreement Template</div><div id="current-template">—</div></div>
+        </div>
+
+        <h3 style="margin-top:18px;">Context and lookups</h3>
+        <div class="subgrid3" style="margin-top:10px;">
+          <div>
+            <label>Agent</label>
+            <select id="agent"></select>
+            <div class="fieldhelp">Loaded live from Figaf.</div>
+          </div>
+          <div>
+            <label>Company / Subsidiary</label>
+            <select id="companySubsidiary"></select>
+            <div class="fieldhelp">Combined list for the selected Agent.</div>
+          </div>
+        </div>
+
+
+        <h3 style="margin-top:18px;">Agreement template matching inputs</h3>
+        <div class="subgrid3" style="margin-top:10px;">
+          <div>
+            <label>Communication partner short name</label>
+            <select id="communicationPartnerShortName"></select>
+            <div class="fieldhelp">Loaded from the spreadsheet codelist (leading dots removed).</div>
+          </div>
+          <div>
+            <label>Core process</label>
+            <select id="coreProcess"></select>
+            <div class="fieldhelp">Loaded from the spreadsheet codelist.</div>
+          </div>
+          <div>
+            <label>Direction</label>
+            <select id="direction"></select>
+            <div class="fieldhelp">Loaded from the spreadsheet codelist.</div>
+          </div>
+          <div>
+            <label>Business object</label>
+            <select id="businessObject"></select>
+            <div class="fieldhelp">Loaded from the spreadsheet codelist.</div>
+          </div>
+          <div>
+            <label>Template typeSystem</label>
+            <select id="templateTypeSystem"></select>
+            <div class="fieldhelp">Loaded from the spreadsheet codelist.</div>
+          </div>
+          <div>
+            <label>Suggested TPM Agreement Template(s)</label>
+            <select id="agreementTemplate"></select>
+            <div class="fieldhelp">Auto-proposed from the selected Company / Subsidiary and codelist inputs.</div>
+          </div>
+          <div class="full">
+            <label>Agreement Template proposal</label>
+            <div id="agreementTemplateProposalBox" class="pre">No proposal yet.</div>
+          </div>
+        </div>
+
+        <h3 style="margin-top:18px;">Partner profile</h3>
+        <div class="subgrid" style="margin-top:10px;">
+          <div>
+            <label>Partner type</label>
+            <select id="partnerType">
+              <option value="">Select Partner type</option>
+              <option value="CLOUD_TRADING_PARTNER">Trading Partner</option>
+              <option value="CLOUD_COMMUNICATION_PARTNER">Communication Partner</option>
+            </select>
+            <div class="fieldhelp">Maps to the TPM partner profile type in SAP BTP TPM.</div>
+          </div>
+          <div>
+            <label>Country / Region</label>
+            <select id="countryCode"></select>
+            <div class="fieldhelp">Used for partner country and short-name generation.</div>
+          </div>
+          <div>
+            <label>Partner name (long name)</label>
+            <input id="partnerName" placeholder="ASD International" />
+            <div class="fieldhelp">Business-facing long name.</div>
+          </div>
+          <div>
+            <label>Profile name (short name)</label>
+            <input id="profileName" placeholder="asd_de" />
+            <div class="fieldhelp">Auto-generated as firstword_countrycode in lowercase.</div>
+          </div>
+          <div class="full">
+            <label>Description</label>
+            <textarea id="description" placeholder="Optional onboarding notes"></textarea>
+          </div>
+          <div>
+            <label>URL</label>
+            <input id="url" placeholder="https://partner.example.com" />
+          </div>
+          <div>
+            <label>Parent company ID</label>
+            <input id="parentCompanyId" placeholder="Optional if relevant" />
+          </div>
+        </div>
+
+        <h3 style="margin-top:18px;">System and format</h3>
+        <div class="subgrid3" style="margin-top:10px;">
+          <div>
+            <label>System Type</label>
+            <select id="systemTypeId"></select>
+          </div>
+          <div>
+            <label>Type System</label>
+            <select id="typeSystemId"></select>
+          </div>
+          <div>
+            <label>Type System Version</label>
+            <select id="typeSystemVersionId"></select>
+          </div>
+        </div>
+
+        <h3 style="margin-top:18px;">Address</h3>
+        <div class="subgrid3" style="margin-top:10px;">
+          <div><label>City</label><input id="city" /></div>
+          <div><label>Street name</label><input id="streetName" /></div>
+          <div><label>House number</label><input id="houseNumber" /></div>
+          <div><label>Postal code</label><input id="postalCode" /></div>
+          <div><label>PO Box</label><input id="poBox" /></div>
+          <div><label>PO Box postal code</label><input id="poBoxPostalCode" /></div>
+        </div>
+
+        <h3 style="margin-top:18px;">Identifiers</h3>
+        <div class="subgrid3" style="margin-top:10px;">
+          <div><label>SAP Identifier</label><input id="sapIdentifier" /></div>
+          <div><label>GS1 GLN Identifier</label><input id="gs1GlnIdentifier" /></div>
+          <div><label>DUNS Identifier</label><input id="dunsIdentifier" /></div>
+          <div><label>Mutually Defined Identifier</label><input id="mutuallyDefinedIdentifier" /></div>
+          <div><label>NA Identifier</label><input id="naIdentifier" /></div>
+          <div><label>Odette Identifier</label><input id="odetteIdentifier" /></div>
+        </div>
+
+        <h3 style="margin-top:18px;">Communication</h3>
+        <div class="subgrid3" style="margin-top:10px;">
+          <div><label>Sender adapter type</label><select id="senderAdapterType"></select></div>
+          <div><label>Sender communication name</label><input id="senderCommunicationName" value="Process_Direct Sender 001" /></div>
+          <div><label>Sender communication alias prefix</label><input id="senderCommunicationAliasPrefix" value="Generic" /></div>
+          <div><label>Receiver adapter type</label><select id="receiverAdapterType"></select></div>
+          <div><label>Receiver communication name</label><input id="receiverCommunicationName" value="Process_Direct Receiver 001" /></div>
+          <div><label>Receiver communication alias prefix</label><input id="receiverCommunicationAliasPrefix" value="Generic" /></div>
+          <div class="full"><label>Receiver Process Direct URL</label><input id="receiverProcessDirectUrl" placeholder="/b2b/partner/001" /></div>
+        </div>
+
+        <h3 style="margin-top:18px;">Advanced AS2 inputs</h3>
+        <div class="subgrid3" style="margin-top:10px;">
+          <div><label>Sender AS2 partner ID</label><input id="senderAs2PartnerId" /></div>
+          <div><label>Sender AS2 username for security correlation</label><input id="senderAs2UserForSecurity" /></div>
+          <div><label>Sender AS2 username for BTP authentication</label><input id="senderAs2UserForBtp" /></div>
+          <div><label>AS2 functional acknowledgements sender name</label><input id="as2AckSenderName" /></div>
+          <div><label>AS2 functional acknowledgements sender alias</label><input id="as2AckSenderAlias" /></div>
+        </div>
+
+        <div class="actions">
+          <button id="prevBtn">Previous</button>
+          <button id="nextBtn">Next</button>
+          <button class="primary" id="saveContextBtn">Save current context</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="section-title">Onboarding Helper</h3>
+        <div class="muted" style="margin-bottom:10px;">Ask how to proceed, what input is expected, whether the current selections look sane, and review the automatically proposed Agreement Template.</div>
+        <label>Ask the helper</label>
+        <textarea id="copilotMessage" placeholder="What should I fill in for System Type and Type System?"></textarea>
+        <div class="actions">
+          <button class="primary" id="askBtn">Ask helper</button>
+          <button id="saveProposalBtn" disabled>Save note</button>
+          <button id="refreshProposalsBtn">Refresh saved notes</button>
+        </div>
+        <label style="margin-top:14px;">Helper reply</label>
+        <div class="pre" id="replyBox">No reply yet.</div>
+        <label style="margin-top:14px;">Validation and sanity checks</label>
+        <div id="checksBox" class="pre">No validation output yet.</div>
+        <label style="margin-top:14px;">AI helper context</label>
+        <div id="payloadBox" class="pre"></div>
+        <h4 style="margin-top:14px;">Saved helper notes</h4>
+        <div id="proposalList"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const COUNTRIES = [
+  ['','Select Country / Region'], ['DE','Germany'], ['DK','Denmark'], ['US','United States'], ['BE','Belgium'], ['IE','Ireland'],
+  ['SE','Sweden'], ['SV','El Salvador'], ['NL','Netherlands'], ['FR','France'], ['GB','United Kingdom'], ['NO','Norway']
+];
+const state = {
+  stepIndex: 0,
+  steps: [
+    { title: 'Collect onboarding context', purpose: 'Pick the Agent, Company / Subsidiary, and Agreement Template.' },
+    { title: 'Define partner profile', purpose: 'Fill the long name, generated short name, country, and profile basics.' },
+    { title: 'Add systems and communication', purpose: 'Choose TPM system and communication-related parameters.' },
+    { title: 'Validate and review', purpose: 'Use the helper to validate and sanity-check the full onboarding form.' }
+  ],
+  agents: [], entities: [], agreementTemplates: [], agreementTemplateProposal: null, codelists: {}, formOptions: { systemTypes:[], typeSystems:[], senderAdapters:[], receiverAdapters:[], existingPartnerProfiles:[] }, typeSystemVersions: [], currentProposal: null
+};
+const el = id => document.getElementById(id);
+function setError(msg){ const box=el('error-box'); box.style.display = msg ? 'block':'none'; box.textContent = msg || ''; }
+function setSuccess(msg){ const box=el('success-box'); box.style.display = msg ? 'block':'none'; box.textContent = msg || ''; if(msg) setTimeout(()=>box.style.display='none',2500); }
+async function api(path, options={}){
+  const res = await fetch('/backend'+path, { ...options, headers: { 'Content-Type': 'application/json', ...(options.headers||{}) } });
+  const text = await res.text(); let data; try{ data=JSON.parse(text); } catch { data=text; }
+  if(!res.ok) throw new Error(typeof data==='string' ? data : (data.message || data.error || `Request failed: ${res.status}`));
+  return data;
+}
+function populateSelect(id, items, label='name', value='id', placeholder='Select'){
+  const s = el(id); s.innerHTML = `<option value="">${placeholder}</option>` + (items||[]).map(item => `<option value="${item[value]}">${item[label] || item.displayName || item.title || item.id}</option>`).join('');
+}
+function renderSteps(){
+  el('steps').innerHTML = state.steps.map((s,i)=>`<div class="step ${i===state.stepIndex?'active':''}" data-step="${i}"><div><strong>${i+1}. ${s.title}</strong></div><div class="small muted">${s.purpose}</div></div>`).join('');
+  document.querySelectorAll('.step').forEach(n => n.onclick = ()=>{ state.stepIndex = Number(n.dataset.step); renderCurrentStep(); renderSteps(); });
+}
+function renderCurrentStep(){
+  const step = state.steps[state.stepIndex];
+  el('step-title').textContent = step.title;
+  el('step-purpose').textContent = step.purpose;
+  el('progress-pill').textContent = `Step ${state.stepIndex+1} / ${state.steps.length}`;
+  const agent = state.agents.find(x=>x.id===el('agent').value);
+  const entity = state.entities.find(x=>x.id===el('companySubsidiary').value);
+  const tpl = state.agreementTemplates.find(x=>x.id===el('agreementTemplate').value);
+  el('current-agent').textContent = agent ? agent.name : '—';
+  el('current-entity').textContent = entity ? `${entity.displayName || entity.title} (${entity.type && entity.type.includes('SUBSIDIARY')?'Subsidiary':'Company'})` : '—';
+  el('current-template').textContent = tpl ? tpl.name : '—';
+  el('payloadBox').textContent = JSON.stringify(buildContext(), null, 2);
+}
+function labelEntity(item){
+  const type = String(item.type || '');
+  const kind = type.includes('SUBSIDIARY') ? 'Subsidiary' : (type.includes('COMPANY') ? 'Company' : 'Entity');
+  return `${item.displayName || item.title || item.name || item.id} (${kind})`;
+}
+function generateProfileName(){
+  const partner = (el('partnerName').value || '').trim();
+  const country = (el('countryCode').value || '').trim().toLowerCase();
+  const firstWord = partner.split(/\s+/).filter(Boolean)[0] || '';
+  const normalized = firstWord.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Za-z0-9]/g,'').toLowerCase();
+  let proposed = normalized;
+  if (normalized && country) proposed = `${normalized}_${country}`;
+  else if (!normalized && country) proposed = country;
+  el('profileName').value = proposed;
+}
+function bindInputRerender(ids){ ids.forEach(id => { const node=el(id); if(node) node.addEventListener(node.tagName==='SELECT'?'change':'input', renderCurrentStep); }); }
+function buildContext(){
+  const entity = state.entities.find(x=>x.id===el('companySubsidiary').value) || null;
+  const tpl = state.agreementTemplates.find(x=>x.id===el('agreementTemplate').value) || null;
+  return {
+    currentStep: state.steps[state.stepIndex],
+    selections: {
+      agentId: el('agent').value,
+      companyOrSubsidiaryId: el('companySubsidiary').value,
+      agreementTemplateId: el('agreementTemplate').value
+    },
+    selectedEntity: entity,
+    selectedAgreementTemplate: tpl,
+    agreementTemplates: state.agreementTemplates,
+    agreementTemplateProposal: state.agreementTemplateProposal || null,
+    fields: {
+      communicationPartnerShortName: el('communicationPartnerShortName').value, coreProcess: el('coreProcess').value, direction: el('direction').value, businessObject: el('businessObject').value, templateTypeSystem: el('templateTypeSystem').value,
+      partnerType: el('partnerType').value, partnerName: el('partnerName').value, profileName: el('profileName').value,
+      countryCode: el('countryCode').value, description: el('description').value, url: el('url').value, parentCompanyId: el('parentCompanyId').value,
+      systemTypeId: el('systemTypeId').value, typeSystemId: el('typeSystemId').value, typeSystemVersionId: el('typeSystemVersionId').value,
+      city: el('city').value, streetName: el('streetName').value, houseNumber: el('houseNumber').value, postalCode: el('postalCode').value, poBox: el('poBox').value, poBoxPostalCode: el('poBoxPostalCode').value,
+      sapIdentifier: el('sapIdentifier').value, gs1GlnIdentifier: el('gs1GlnIdentifier').value, dunsIdentifier: el('dunsIdentifier').value, mutuallyDefinedIdentifier: el('mutuallyDefinedIdentifier').value, naIdentifier: el('naIdentifier').value, odetteIdentifier: el('odetteIdentifier').value,
+      senderAdapterType: el('senderAdapterType').value, senderCommunicationName: el('senderCommunicationName').value, senderCommunicationAliasPrefix: el('senderCommunicationAliasPrefix').value,
+      receiverAdapterType: el('receiverAdapterType').value, receiverCommunicationName: el('receiverCommunicationName').value, receiverCommunicationAliasPrefix: el('receiverCommunicationAliasPrefix').value, receiverProcessDirectUrl: el('receiverProcessDirectUrl').value,
+      senderAs2PartnerId: el('senderAs2PartnerId').value, senderAs2UserForSecurity: el('senderAs2UserForSecurity').value, senderAs2UserForBtp: el('senderAs2UserForBtp').value, as2AckSenderName: el('as2AckSenderName').value, as2AckSenderAlias: el('as2AckSenderAlias').value
+    }
+  };
+}
+async function loadUser(){
+  try{ const data = await api('/api/me'); const u=data.user||{}; el('user-pill').textContent=`User: ${u.name || u.user_name || u.email || 'authenticated'}`; }catch{ el('user-pill').textContent='User: unavailable'; }
+}
+
+async function loadCodelists(){
+  const data = await api('/api/reference/codelists');
+  state.codelists = data.items || {};
+  populateSelect('communicationPartnerShortName', (state.codelists.communicationPartnerShortName || []).map(x=>({id:x,name:x})), 'name', 'id', 'Select communication partner short name');
+  populateSelect('coreProcess', (state.codelists.coreProcess || []).map(x=>({id:x,name:x})), 'name', 'id', 'Select core process');
+  populateSelect('direction', (state.codelists.direction || []).map(x=>({id:x,name:x})), 'name', 'id', 'Select direction');
+  populateSelect('businessObject', (state.codelists.businessObject || []).map(x=>({id:x,name:x})), 'name', 'id', 'Select business object');
+  populateSelect('templateTypeSystem', (state.codelists.templateTypeSystem || []).map(x=>({id:x,name:x})), 'name', 'id', 'Select template typeSystem');
+}
+
+async function loadAgents(){
+  const data = await api('/api/figaf/agents');
+  state.agents = data.items || [];
+  populateSelect('agent', state.agents, 'name', 'id', 'Select Agent');
+  if(state.agents[0]){ el('agent').value = state.agents[0].id; await onAgentChange(); }
+}
+async function onAgentChange(){
+  const agentId = el('agent').value; if(!agentId) return;
+  const [companiesRes, optionsRes] = await Promise.all([
+    api(`/api/figaf/companies?agentId=${encodeURIComponent(agentId)}`),
+    api(`/api/figaf/partner-form-options?agentId=${encodeURIComponent(agentId)}`)
+  ]);
+  state.entities = (companiesRes.items || []).map(item => ({ ...item, label: labelEntity(item) }));
+  state.formOptions = optionsRes.data || { systemTypes:[], typeSystems:[], senderAdapters:[], receiverAdapters:[], existingPartnerProfiles:[] };
+  populateSelect('companySubsidiary', state.entities, 'label', 'id', 'Select Company / Subsidiary');
+  populateSelect('systemTypeId', state.formOptions.systemTypes || [], 'name', 'id', 'Select System Type');
+  populateSelect('typeSystemId', state.formOptions.typeSystems || [], 'name', 'id', 'Select Type System');
+  populateSelect('senderAdapterType', state.formOptions.senderAdapters || [], 'name', 'id', 'Select Sender adapter type');
+  populateSelect('receiverAdapterType', state.formOptions.receiverAdapters || [], 'name', 'id', 'Select Receiver adapter type');
+  if ((state.formOptions.senderAdapters || []).some(x=>x.id==='Process_Direct')) el('senderAdapterType').value='Process_Direct';
+  if ((state.formOptions.receiverAdapters || []).some(x=>x.id==='Process_Direct')) el('receiverAdapterType').value='Process_Direct';
+  populateSelect('agreementTemplate', [], 'name', 'id', 'Select codelist inputs first');
+  state.agreementTemplates = []; state.agreementTemplateProposal = null; state.typeSystemVersions = []; el('agreementTemplateProposalBox').textContent = 'No proposal yet.'; populateSelect('typeSystemVersionId', [], 'name', 'id', 'Select Type System Version');
+  if (state.entities[0]) { el('companySubsidiary').value = state.entities[0].id; await onEntityChange(); }
+  renderCurrentStep();
+}
+async function onEntityChange(){
+  const entityId = el('companySubsidiary').value; if(!entityId) return;
+  const entity = state.entities.find(x=>x.id===entityId);
+  const agentId = el('agent').value;
+  try{
+    const data = await api(`/api/figaf/agreement-templates?agentId=${encodeURIComponent(agentId)}&entityId=${encodeURIComponent(entityId)}&entityName=${encodeURIComponent(entity?.name || '')}&entityDisplayName=${encodeURIComponent(entity?.displayName || entity?.title || '')}`);
+    state.agreementTemplates = data.items || [];
+    populateSelect('agreementTemplate', state.agreementTemplates, 'name', 'id', state.agreementTemplates.length ? 'Select Agreement Template' : 'No Agreement Templates found');
+  } catch(e){ state.agreementTemplates=[]; populateSelect('agreementTemplate', [], 'name', 'id', 'Agreement Templates unavailable'); setError(e.message); }
+  try { await refreshAgreementTemplateProposal(); } catch(_e) {}
+  renderCurrentStep();
+}
+
+async function refreshAgreementTemplateProposal(){
+  const entityId = el('companySubsidiary').value;
+  const entity = state.entities.find(x=>x.id===entityId);
+  if(!entity || !state.agreementTemplates.length){
+    state.agreementTemplateProposal = null;
+    el('agreementTemplateProposalBox').textContent = 'No proposal yet.';
+    renderCurrentStep();
+    return;
+  }
+  const required = ['coreProcess','direction','businessObject','templateTypeSystem'];
+  const missing = required.filter(id => !el(id).value);
+  if(missing.length){
+    state.agreementTemplateProposal = null;
+    populateSelect('agreementTemplate', state.agreementTemplates, 'name', 'id', 'Select codelist inputs first');
+    el('agreementTemplateProposalBox').textContent = 'Select core process, direction, business object, and template typeSystem to get an Agreement Template proposal.';
+    renderCurrentStep();
+    return;
+  }
+  const data = await api('/api/figaf/agreement-template-proposal', {
+    method:'POST',
+    body: JSON.stringify({
+      agentId: el('agent').value,
+      entity,
+      availableTemplates: state.agreementTemplates,
+      communicationPartnerShortName: el('communicationPartnerShortName').value,
+      coreProcess: el('coreProcess').value,
+      direction: el('direction').value,
+      businessObject: el('businessObject').value,
+      templateTypeSystem: el('templateTypeSystem').value
+    })
+  });
+  state.agreementTemplateProposal = data;
+  const proposalItems = (data.matches || []).map(x => ({ id: x.id, name: `${x.name} ${x.score ? `(score ${x.score})` : ''}` }));
+  populateSelect('agreementTemplate', proposalItems.length ? proposalItems : state.agreementTemplates, 'name', 'id', proposalItems.length ? 'Suggested Agreement Template(s)' : 'No matching Agreement Templates');
+  if (data.bestMatch) el('agreementTemplate').value = data.bestMatch.id;
+  const summary = {
+    companyShortName: data.companyShortName || '',
+    expectedNames: data.expectedNames || [],
+    bestMatch: data.bestMatch ? data.bestMatch.name : null,
+    candidateCount: (data.matches || []).length
+  };
+  el('agreementTemplateProposalBox').textContent = JSON.stringify(summary, null, 2);
+  renderCurrentStep();
+}
+
+async function onTypeSystemChange(){
+  const agentId = el('agent').value; const typeSystemId = el('typeSystemId').value;
+  if(!agentId || !typeSystemId){ state.typeSystemVersions=[]; populateSelect('typeSystemVersionId', [], 'name', 'id', 'Select Type System Version'); return; }
+  try{
+    const data = await api(`/api/figaf/type-system-versions?agentId=${encodeURIComponent(agentId)}&typeSystemId=${encodeURIComponent(typeSystemId)}`);
+    state.typeSystemVersions = data.items || [];
+    populateSelect('typeSystemVersionId', state.typeSystemVersions, 'name', 'id', 'Select Type System Version');
+  } catch(e){ setError(e.message); }
+  renderCurrentStep();
+}
+async function askHelper(){
+  const message = el('copilotMessage').value.trim();
+  if(!message) return setError('Please enter a question for the helper.');
+  const data = await api('/api/ai/chat', { method:'POST', body: JSON.stringify({ message, context: buildContext() }) });
+  el('replyBox').textContent = data.reply || 'No reply';
+  const checks = Array.isArray(data.validations) ? data.validations : [];
+  el('checksBox').innerHTML = checks.length ? `<ul class="checks">${checks.map(x=>`<li>${x}</li>`).join('')}</ul><div style="margin-top:8px">${data.recommendation || ''}</div>` : (data.recommendation || 'No validation findings.');
+  state.currentProposal = { summary: message, reasoning: data.reply || '', changes: { recommendation: data.recommendation || '', validations: checks } };
+  el('saveProposalBtn').disabled = false;
+  setSuccess('Helper response loaded.');
+}
+async function loadNotes(){
+  const data = await api('/api/ai/proposals'); const items=data.items||[];
+  el('proposalList').innerHTML = items.length ? items.map(item => `<div class="proposal"><div><strong>${item.proposal.summary}</strong></div><div class="small muted">${item.status} · ${new Date(item.createdAt).toLocaleString()}</div><div style="margin-top:8px" class="small">${item.proposal.reasoning || ''}</div></div>`).join('') : '<div class="muted">No saved helper notes yet.</div>';
+}
+async function saveNote(){
+  if(!state.currentProposal) return;
+  await api('/api/ai/proposals', { method:'POST', body: JSON.stringify({ proposal: state.currentProposal, sourceMessage: el('copilotMessage').value }) });
+  setSuccess('Helper note saved.');
+  await loadNotes();
+}
+async function init(){
+  try{
+    COUNTRIES.forEach(([code,name]) => { const o=document.createElement('option'); o.value=code; o.textContent=name; el('countryCode').appendChild(o); });
+    const health = await api('/api/health'); el('status-pill').textContent = `Backend: ${health.service} ${health.version || ''}`.trim();
+    renderSteps(); renderCurrentStep(); await loadUser(); await loadCodelists(); await loadAgents(); await loadNotes();
+    el('agent').onchange = ()=>onAgentChange().catch(e=>setError(e.message));
+    el('companySubsidiary').onchange = ()=>onEntityChange().catch(e=>setError(e.message));
+    el('typeSystemId').onchange = ()=>onTypeSystemChange().catch(e=>setError(e.message));
+    ['communicationPartnerShortName','coreProcess','direction','businessObject','templateTypeSystem'].forEach(id => { el(id).onchange = ()=>refreshAgreementTemplateProposal().catch(e=>setError(e.message)); });
+    el('countryCode').onchange = ()=>{ generateProfileName(); renderCurrentStep(); };
+    el('partnerName').oninput = ()=>{ generateProfileName(); renderCurrentStep(); };
+    bindInputRerender(['agreementTemplate','communicationPartnerShortName','coreProcess','direction','businessObject','templateTypeSystem','partnerType','profileName','description','url','parentCompanyId','systemTypeId','typeSystemVersionId','city','streetName','houseNumber','postalCode','poBox','poBoxPostalCode','sapIdentifier','gs1GlnIdentifier','dunsIdentifier','mutuallyDefinedIdentifier','naIdentifier','odetteIdentifier','senderAdapterType','senderCommunicationName','senderCommunicationAliasPrefix','receiverAdapterType','receiverCommunicationName','receiverCommunicationAliasPrefix','receiverProcessDirectUrl','senderAs2PartnerId','senderAs2UserForSecurity','senderAs2UserForBtp','as2AckSenderName','as2AckSenderAlias']);
+    el('prevBtn').onclick = ()=>{ state.stepIndex=Math.max(0,state.stepIndex-1); renderSteps(); renderCurrentStep(); };
+    el('nextBtn').onclick = ()=>{ state.stepIndex=Math.min(state.steps.length-1,state.stepIndex+1); renderSteps(); renderCurrentStep(); };
+    el('saveContextBtn').onclick = ()=> setSuccess('Context saved locally in the current browser session.');
+    el('askBtn').onclick = ()=>askHelper().catch(e=>setError(e.message));
+    el('refreshProposalsBtn').onclick = ()=>loadNotes().catch(e=>setError(e.message));
+    el('saveProposalBtn').onclick = ()=>saveNote().catch(e=>setError(e.message));
+    generateProfileName();
+  } catch(e){ setError(e.message); }
+}
+init();
+</script>
+</body>
+</html>

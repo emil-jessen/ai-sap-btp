@@ -17,10 +17,12 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@sap-cloud-sdk/connectivity": "^4.6.0",
+    "@sap-cloud-sdk/http-client": "^4.6.0",
     "@sap/cds": "^8",
     "@sap/xssec": "^4",
-    "passport": "^0",
-    "express": "^4"
+    "express": "^4",
+    "passport": "^0"
   },
   "devDependencies": {
     "@sap/cds-dk": "^8",

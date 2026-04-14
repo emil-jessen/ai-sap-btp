@@ -10,6 +10,13 @@
       "csrfProtection": false
     },
     {
+      "source": "^/figaf/(.*)$",
+      "target": "/figaf/$1",
+      "destination": "my-btp-app-backend",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
+    },
+    {
       "source": "^(.*)$",
       "target": "$1",
       "service": "html5-apps-repo-rt",

@@ -1,47 +1,92 @@
-<!-- edited with XMLSpy v2013 (x64) (http://www.altova.com) by Emil Jessen (Emil Jessen Consulting) -->
-<mvc:View controllerName="mybtpappui.controller.List" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:semantic="sap.f.semantic" displayBlock="true">
-	<semantic:SemanticPage id="listPage">
-		<semantic:titleHeading>
-			<Title text="{i18n>appTitle}" level="H2"/>
-		</semantic:titleHeading>
-		<semantic:content>
-			<Table id="itemsTable" width="auto" items="{
-          path: '/Items',
-          sorter: { path: 'priority', descending: false }
-        }" noDataText="{i18n>noData}" busyIndicatorDelay="0">
-				<headerToolbar>
-					<OverflowToolbar>
-						<Title text="{i18n>tableTitle}" level="H3"/>
-						<ToolbarSpacer/>
-						<SearchField width="20rem" placeholder="{i18n>searchPlaceholder}" search=".onSearch" liveChange=".onSearch"/>
-						<Button id="createBtn" text="{i18n>createButton}" type="Emphasized" press=".onCreate" visible="{= ${/userInfo/isAdmin} === true}"/>
-					</OverflowToolbar>
-				</headerToolbar>
-				<columns>
-					<Column>
-						<Text text="{i18n>colTitle}"/>
-					</Column>
-					<Column>
-						<Text text="{i18n>colStatus}"/>
-					</Column>
-					<Column>
-						<Text text="{i18n>colPriority}"/>
-					</Column>
-					<Column hAlign="End">
-						<Text text="{i18n>colActions}"/>
-					</Column>
-				</columns>
-				<items>
-					<ColumnListItem type="Navigation" press=".onItemPress">
-						<cells>
-							<ObjectIdentifier title="{title}" text="{description}"/>
-							<ObjectStatus text="{status}" state="{= ${status} === 'done' ? 'Success' : ${status} === 'inProgress' ? 'Warning' : 'Information'}"/>
-							<Text text="{priority}"/>
-							<Button text="{i18n>markDoneButton}" type="Ghost" press=".onMarkDone" visible="{= ${status} !== 'done'}"/>
-						</cells>
-					</ColumnListItem>
-				</items>
-			</Table>
-		</semantic:content>
-	</semantic:SemanticPage>
+<mvc:View
+  controllerName="mybtpappui.controller.List"
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m"
+  xmlns:core="sap.ui.core"
+  displayBlock="true">
+  <Page id="figafLandingPage" showHeader="false" class="figafPage">
+    <content>
+      <VBox class="figafShell">
+        <HBox class="figafHero" wrap="Wrap" alignItems="Center" justifyContent="SpaceBetween">
+          <VBox class="figafHeroCopy">
+            <Text text="Figaf AI analysis" class="figafEyebrow" />
+            <Title text="Find weak spots in B2B master data before they reach production." level="H1" class="figafTitle" />
+            <Text
+              text="Run AI-assisted consistency checks across partners, company subsidiaries, and scenarios from the Figaf Test Tool landscape."
+              class="figafLead" />
+            <HBox class="figafActions" wrap="Wrap">
+              <Button text="Analyze Figaf data" type="Emphasized" press=".onStartAnalysis" class="figafPrimaryButton" />
+              <Button text="Connection plan" type="Transparent" press=".onConnectionPlan" />
+            </HBox>
+          </VBox>
+          <VBox class="figafHeroVisual" alignItems="Center">
+            <Image
+              src="https://figaf.com/wp-content/uploads/2025/11/2510-Release-1024x536.png"
+              decorative="false"
+              alt="Figaf B2B overview"
+              densityAware="false"
+              class="figafHeroImage" />
+            <Text text="B2B landscape readiness" class="figafImageCaption" />
+          </VBox>
+        </HBox>
+
+        <HBox class="figafMetricBand" wrap="Wrap">
+          <VBox class="figafMetric">
+            <Text text="3" class="figafMetricValue" />
+            <Text text="Data models" class="figafMetricLabel" />
+          </VBox>
+          <VBox class="figafMetric">
+            <Text text="AI" class="figafMetricValue" />
+            <Text text="Inconsistency review" class="figafMetricLabel" />
+          </VBox>
+          <VBox class="figafMetric">
+            <Text text="BTP" class="figafMetricValue" />
+            <Text text="Ready for same-tenant Figaf APIs" class="figafMetricLabel" />
+          </VBox>
+        </HBox>
+
+        <VBox class="figafSection">
+          <Text text="Choose analysis scope" class="figafEyebrow" />
+          <Title text="Start with the data model that carries the most risk." level="H2" class="figafSectionTitle" />
+          <HBox class="figafCards" wrap="Wrap" justifyContent="SpaceBetween">
+            <VBox class="figafCard">
+              <core:Icon src="sap-icon://collaborate" class="figafCardIcon" />
+              <Title text="Partners" level="H3" class="figafCardTitle" />
+              <Text text="Detect duplicate partner identities, missing communication partners, inconsistent identifiers, and naming drift." class="figafCardText" />
+              <Button text="Analyze partners" type="Ghost" press=".onAnalyzePartners" class="figafCardButton" />
+            </VBox>
+            <VBox class="figafCard">
+              <core:Icon src="sap-icon://company-view" class="figafCardIcon" />
+              <Title text="Company/subsidiaries" level="H3" class="figafCardTitle" />
+              <Text text="Check subsidiary identifiers, qualifier usage, communication setup, and parent-company alignment." class="figafCardText" />
+              <Button text="Analyze subsidiaries" type="Ghost" press=".onAnalyzeSubsidiaries" class="figafCardButton" />
+            </VBox>
+            <VBox class="figafCard">
+              <core:Icon src="sap-icon://process" class="figafCardIcon" />
+              <Title text="Scenarios" level="H3" class="figafCardTitle" />
+              <Text text="Review scenario coverage, agreement update states, missing links, and migration readiness signals." class="figafCardText" />
+              <Button text="Analyze scenarios" type="Ghost" press=".onAnalyzeScenarios" class="figafCardButton" />
+            </VBox>
+          </HBox>
+        </VBox>
+
+        <HBox class="figafRoadmap" wrap="Wrap" alignItems="Stretch">
+          <VBox class="figafRoadmapText">
+            <Text text="Next integration step" class="figafEyebrow" />
+            <Title text="Connect to the Figaf tenant API, normalize the three models, then ask the AI to explain mismatches." level="H2" class="figafSectionTitle" />
+            <Text
+              text="The first implementation can read Figaf partners, company/subsidiaries, and B2B scenarios into CAP entities. The AI layer can then compare identifiers, communications, ownership, and agreement status across the three views."
+              class="figafBodyText" />
+          </VBox>
+          <VBox class="figafChecklist">
+            <Text text="Planned checks" class="figafChecklistTitle" />
+            <Text text="Partner and subsidiary identifier collisions" class="figafChecklistItem" />
+            <Text text="Missing communication channel assignments" class="figafChecklistItem" />
+            <Text text="Scenario references to inactive or incomplete objects" class="figafChecklistItem" />
+            <Text text="Migration readiness and test coverage gaps" class="figafChecklistItem" />
+          </VBox>
+        </HBox>
+      </VBox>
+    </content>
+  </Page>
 </mvc:View>

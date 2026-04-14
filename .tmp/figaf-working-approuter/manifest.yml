@@ -1,0 +1,11 @@
+---
+applications:
+  - name: figaf-tpm-approuter
+    memory: 256M
+    instances: 1
+    buildpacks:
+      - nodejs_buildpack
+    services:
+      - figaf-tpm-xsuaa
+    env:
+      BACKEND_URL: https://figaf-tpm-guide-backend.cfapps.us10-001.hana.ondemand.com

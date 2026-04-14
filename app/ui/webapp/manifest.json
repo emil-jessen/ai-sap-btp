@@ -12,16 +12,6 @@
     "applicationVersion": {
       "version": "1.0.0"
     },
-    "dataSources": {
-      "mainService": {
-        "uri": "/catalog/",
-        "type": "OData",
-        "settings": {
-          "annotations": [],
-          "odataVersion": "4.0"
-        }
-      }
-    },
     "crossNavigation": {
       "inbounds": {
         "intent1": {
@@ -40,7 +30,7 @@
   "sap.ui": {
     "technology": "UI5",
     "icons": {
-      "icon": "sap-icon://task",
+      "icon": "sap-icon://business-objects-experience",
       "favIcon": "",
       "phone": "",
       "phone@2": "",
@@ -70,22 +60,19 @@
       "cozy": true
     },
     "models": {
-      "": {
-        "dataSource": "mainService",
-        "preload": true,
-        "settings": {
-          "synchronizationMode": "None",
-          "operationMode": "Server",
-          "autoExpandSelect": true,
-          "earlyRequests": true
-        }
-      },
       "i18n": {
         "type": "sap.ui.model.resource.ResourceModel",
         "settings": {
           "bundleName": "mybtpappui.i18n.i18n"
         }
       }
+    },
+    "resources": {
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
     },
     "routing": {
       "config": {
