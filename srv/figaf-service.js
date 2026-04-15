@@ -11,6 +11,9 @@ const AGENTS_ENDPOINT = '/api/agent/search';
 const AGENTS_SEARCH_BODY = { includeDecentralAdapterEngines: true };
 const SCENARIOS_ENDPOINT = '/api/integration-object/filter';
 
+// In-memory token cache for username/password login (key: "baseUrl|username")
+const _loginTokenCache = {};
+
 module.exports = class FigafService extends cds.ApplicationService {
   async init() {
     this.on('status', (req) => this._status(req));
@@ -44,6 +47,8 @@ module.exports = class FigafService extends cds.ApplicationService {
       useDestination: process.env.FIGAF_USE_DESTINATION !== 'false',
       agentId: process.env.FIGAF_AGENT_ID,
       agentSystemId: process.env.FIGAF_AGENT_SYSTEM_ID || DEFAULT_AGENT_SYSTEM_ID,
+      username: process.env.FIGAF_USERNAME,
+      password: process.env.FIGAF_PASSWORD,
       clientId: process.env.FIGAF_CLIENT_ID,
       clientSecret: process.env.FIGAF_CLIENT_SECRET,
       internalBaseUrl: process.env.FIGAF_INTERNAL_BASE_URL,
@@ -68,15 +73,18 @@ module.exports = class FigafService extends cds.ApplicationService {
     const destinationTokenDiagnostics = this._authHeaderDiagnostics(destination?.authHeader);
     const hasDestinationToken = Boolean(destination?.authHeader);
     const hasDirectCredentials = Boolean(config.clientId && config.clientSecret);
-    const configured = hasDestinationToken || hasDirectCredentials || Boolean(config.sessionCookie);
+    const hasUsernameCredentials = Boolean(config.username && config.password);
+    const configured = hasDestinationToken || hasDirectCredentials || Boolean(config.sessionCookie) || hasUsernameCredentials;
     const connectionMode = hasDestinationToken
       ? 'destination'
       : config.sessionCookie
         ? 'session-cookie'
-        : 'direct';
+        : hasUsernameCredentials
+          ? 'login'
+          : 'direct';
     const message = configured
       ? 'Figaf connection settings are present, but data reads still validate the credentials against Figaf.'
-      : 'Create a figaf-api destination that can access the Figaf WebUI APIs, set a temporary FIGAF_SESSION_COOKIE, or set valid Figaf credentials on my-btp-app-srv.';
+      : 'Create a figaf-api destination that can access the Figaf WebUI APIs, set FIGAF_USERNAME + FIGAF_PASSWORD, or set a temporary FIGAF_SESSION_COOKIE.';
 
     return {
       configured,
@@ -85,6 +93,7 @@ module.exports = class FigafService extends cds.ApplicationService {
       baseUrl: destination?.baseUrl || config.baseUrl,
       hasClientId: Boolean(config.clientId),
       hasClientSecret: Boolean(config.clientSecret),
+      hasUsername: Boolean(config.username),
       hasDestination: Boolean(destination),
       hasSessionCookie: Boolean(config.sessionCookie),
       destinationAuthentication: destination?.authentication || '',
@@ -248,6 +257,7 @@ module.exports = class FigafService extends cds.ApplicationService {
       body: JSON.stringify({
         model,
         temperature: 0.2,
+        max_output_tokens: 800,
         input: [
           {
             role: 'system',
@@ -256,8 +266,10 @@ module.exports = class FigafService extends cds.ApplicationService {
                 type: 'input_text',
                 text: [
                   'You are a practical Figaf IS TPM advisor.',
+                  'The user payload includes allGapReports with pre-aggregated statistics: topRules (most frequent GAP rules with occurrence counts) and topInconsistentRecords (records with the most findings). Use this to answer statistics or prioritisation questions.',
                   'Help users understand inconsistencies and suggest concrete remediation steps.',
                   'Use the deterministic rules and naming guideline as the foundation.',
+                  'When referencing findings, cite the rule name, its count, and severity from topRules.',
                   'When context is incomplete, say what data is missing and give a safe next step.',
                   'Keep answers concise, actionable, and specific to Figaf B2B partners, companies/subsidiaries, scenarios, MIGs, MAGs, agreements, and statuses.'
                 ].join(' ')
@@ -485,7 +497,7 @@ module.exports = class FigafService extends cds.ApplicationService {
       method: 'POST',
       body: {
         deleted: false,
-        countOfObjectsOnPage: 100,
+        countOfObjectsOnPage: 200,
         countOfPages: 1,
         currentPage: 1,
         existNextPage: false,
@@ -504,7 +516,9 @@ module.exports = class FigafService extends cds.ApplicationService {
 
     const root = this._parsePossiblyJson(response);
     const scenarios = root?.data?.integrationObjects || root?.integrationObjects || root?.data || root || [];
-    return this._normalizeRecords('Scenarios', Array.isArray(scenarios) ? scenarios : []);
+    const totalCount = root?.data?.totalCountOfIntegrationObjects ?? (Array.isArray(scenarios) ? scenarios.length : 0);
+    const value = this._normalizeRecords('Scenarios', Array.isArray(scenarios) ? scenarios : []);
+    return { value, truncated: totalCount > 200, totalCount };
   }
 
   async _readConfiguredModel(model, req) {
@@ -524,7 +538,8 @@ module.exports = class FigafService extends cds.ApplicationService {
 
     const root = this._parsePossiblyJson(response);
     const records = root?.data?.businessEntities || root?.businessEntities || root?.items || root?.content || root?.data || [];
-    return this._normalizeRecords(isPartners ? 'Partners' : 'Company/subsidiaries', records);
+    const value = this._normalizeRecords(isPartners ? 'Partners' : 'Company/subsidiaries', Array.isArray(records) ? records : []);
+    return { value, truncated: false, totalCount: value.length };
   }
 
   async _agentId(req) {
@@ -592,6 +607,19 @@ module.exports = class FigafService extends cds.ApplicationService {
 
     const response = await fetch(`${connection.baseUrl}${path.startsWith('/') ? path : `/${path}`}`, request);
     const text = await response.text();
+
+    // On 401 with username/password login: clear token cache and retry once with a fresh login
+    if (response.status === 401 && config.username && config.password) {
+      delete _loginTokenCache[`${config.baseUrl}|${config.username}`];
+      const freshToken = await this._figafLogin(config);
+      headers.Authorization = `Bearer ${freshToken}`;
+      const retryResponse = await fetch(`${config.baseUrl}${path.startsWith('/') ? path : `/${path}`}`, request);
+      const retryText = await retryResponse.text();
+      if (!retryResponse.ok) {
+        throw new Error(`Figaf API ${method} ${path} failed with HTTP ${retryResponse.status}: ${retryText.slice(0, 300)}`);
+      }
+      return retryText ? this._parsePossiblyJson(retryText) : null;
+    }
 
     if (!response.ok) {
       throw new Error(`Figaf API ${method} ${path} failed with HTTP ${response.status}: ${text.slice(0, 300)}`);
@@ -741,10 +769,51 @@ module.exports = class FigafService extends cds.ApplicationService {
       };
     }
 
+    if (config.username && config.password) {
+      const token = await this._figafLogin(config);
+      return {
+        baseUrl: config.baseUrl,
+        authHeader: `Bearer ${token}`
+      };
+    }
+
     return {
       baseUrl: config.baseUrl,
       authHeader: `Bearer ${await this._getToken(config)}`
     };
+  }
+
+  async _figafLogin(config) {
+    const cacheKey = `${config.baseUrl}|${config.username}`;
+    const cached = _loginTokenCache[cacheKey];
+
+    // Reuse cached token if less than 50 minutes old (tokens typically last 1 hour)
+    if (cached && (Date.now() - cached.loginAt) < 50 * 60 * 1000) {
+      return cached.token;
+    }
+
+    const response = await fetch(`${config.baseUrl}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Cache-Control': 'no-cache'
+      },
+      body: new URLSearchParams({ email: config.username, password: config.password })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Figaf login to ${this._safeHost(config.baseUrl)} failed with HTTP ${response.status}. Check FIGAF_USERNAME and FIGAF_PASSWORD.`);
+    }
+
+    const authHeader = response.headers.get('authorization') || '';
+    const token = authHeader.toLowerCase().startsWith('bearer ') ? authHeader.slice(7) : authHeader;
+
+    if (!token) {
+      throw new Error('Figaf login succeeded but no Bearer token was returned in the authorization header.');
+    }
+
+    _loginTokenCache[cacheKey] = { token, loginAt: Date.now() };
+    return token;
   }
 
   async _getDestination(config, userToken) {

@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cf target:*)",
+      "Bash(npm --version)",
+      "Bash(grep -A20 \"name: my-btp-app-ui$\" mta.yaml)",
+      "Bash(npm run:*)",
+      "Bash(cf deploy:*)",
+      "Bash(curl -s \"https://app.figaf.com/2603/Component-preload.js\")",
+      "Bash(python3 -c ':*)"
+    ]
+  }
+}

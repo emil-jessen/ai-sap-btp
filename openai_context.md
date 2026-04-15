@@ -583,6 +583,16 @@ Latest checkpoint:
     - Backend now converts OpenAI quota/rate-limit 429 responses into graceful unavailable messages for both `/figaf/aiConsistencyAnalysis` and `/figaf/aiAdviceChat`.
     - GAP reports mark the AI layer as `unavailable` instead of showing the raw OpenAI error. Rule-based GAP findings remain usable.
     - Rebuilt `mta_archives/my-btp-app_1.0.0.mtar` after this change; deploy still requires a refreshed `cf login`.
+- 2026-04-14 UI transparency improvements deployed:
+  - Operation `56bff1bb-381e-11f1-b476-eeee0a93db07`; both `my-btp-app-approuter` and `my-btp-app-srv` started successfully.
+  - Changes: connection status dot indicator (idle/loading/ok/error), severity badge in inconsistency column (e.g. "2 High · 1 Med"), agent+timestamp freshness line in table header, AI layer badge in advisor section, colour-coded GAP finding borders (High=red, Medium=orange, Low=teal), "Open GAP report" changed from `<a>` to `<button data-gap-report-id>`, model buttons disable during fetch, Escape key closes dialog, focus set on close button when dialog opens, roadmap updated from "Planned" to "Active checks".
+- 2026-04-14 GAP analysis fixes deployed — Operation `79d46677-382e-11f1-902b-eeee0a8d295f`; both apps started successfully:
+  - Duplicate Draft findings eliminated: removed `addDraftStatusFindings(findings, row, "table")` — table row columns (e.g. "Sender MIG Status") are derived from `additionalData` which is already scanned, causing identical findings at two path labels.
+  - Empty field GAP findings suppressed: removed "Required naming metadata" (`!name`) and "Required geography metadata" (`!Country/Region Code`) checks from `analyzeEntityNaming`.
+  - Scenario MAG / Main Flow population fixed: both fields were falling back to `objectData.displayedName` (the scenario's own name). `magName` now only uses `magMetadata`/`b2b.magName`/`b2b.b2bScenarioName`; `mainFlowName` now only populates when `objectData.integrationObject` is present. One or the other is populated per record (not both).
+- 2026-04-14 Visual redesign deployed:
+  - Operation `e089818d-3821-11f1-b476-eeee0a9dc2ac`; both `my-btp-app-approuter` and `my-btp-app-srv` started successfully.
+  - Changes: system font stack (`-apple-system, BlinkMacSystemFont, Segoe UI, Roboto`), hero external `<img>` replaced with inline SVG B2B network illustration (dark navy bg, partner pills, company node, scenario cards, connection lines), SVG card icons for Partners/Company/Scenarios, card hover lift (`translateY(-3px)`) + teal top border + shadow, primary button semi-gradient + shadow, roadmap copy updated to "How it works / Rule-based detection runs instantly, AI goes deeper on demand".
 - Update this file whenever:
   - a new auth/destination finding is made
   - a new endpoint is confirmed
@@ -597,3 +607,50 @@ Latest checkpoint:
   - Figaf API authorization
   - browser/approuter session state
 - Always retest auth changes in a fresh incognito/private browser session.
+
+## Figaf SaaS Login Mode (April 2026)
+
+Connection mode is now selected via env vars on `my-btp-app-srv`:
+
+- **Login mode** (`FIGAF_USERNAME` + `FIGAF_PASSWORD` set, `FIGAF_USE_DESTINATION=false`):
+  - `POST {FIGAF_BASE_URL}/auth/login` with `application/x-www-form-urlencoded` body: `email=...&password=...`
+  - Bearer token returned in response `authorization` header (not response body)
+  - Token cached in-memory (`_loginTokenCache`) for 50 minutes, keyed by `{baseUrl}|{username}`
+  - On 401 from any API call: cache is cleared and `_figafLogin()` retries once
+- **Destination mode** (`FIGAF_USE_DESTINATION=true`): existing SAP Cloud SDK path, unchanged
+
+Current production config uses login mode pointing at `https://app.figaf.com`.
+
+**Do not commit `FIGAF_USERNAME` or `FIGAF_PASSWORD` to mta.yaml.** Set them with `cf set-env my-btp-app-srv FIGAF_USERNAME <value>` and restart. Note: `cf deploy` with `mta.yaml` does NOT overwrite env vars that are not in `properties`.
+
+## Scenario Flow Field Mapping Fix (April 2026)
+
+B2B scenario payloads store flow data inside `objectData.additionalData` (JSON string) → `b2BScenarioObjectData` object — NOT in `objectData.integrationObject`.
+
+Correct source paths:
+- `mainIflowTechnicalName`, `mainIflowRuntimeStatus`, `mainIflowRuntimeVersion`, `mainIflowDesignVersion`
+- `preIflowTechnicalName`, `preIflowRuntimeStatus`, `preIflowRuntimeVersion`, `preIflowDesignVersion`
+- `postIflowTechnicalName`, `postIflowRuntimeStatus`, `postIflowRuntimeVersion`, `postIflowDesignVersion`
+
+Previously these were empty/wrong because the code was reading `objectData.integrationObject` (a CPI iFlow ID, not a B2B scenario field).
+
+## New GAP Rules (April 2026)
+
+Added to `analyzeScenarioNaming()` in `index.html`:
+
+1. **Flow Runtime Status** (High): each of Main/Pre/Post Flow runtime status must be `"STARTED"` when the flow name is set.
+2. **Flow Version Mismatch** (Medium): runtime version and design version for the same flow must be identical.
+
+## Pagination and Record Limits (April 2026)
+
+- Backend (`_readScenarios()`): fetches up to 200 records (page size 200). Returns `{ value, truncated, totalCount }` using `totalCountOfIntegrationObjects` from Figaf API response.
+- `_readConfiguredModel()` (partners, company/subsidiaries): also wraps result in `{ value, truncated: false, totalCount }`.
+- CDS: `FigafPage` type replaces `array of FigafRecord` for `partners`, `companySubsidiaries`, `scenarios` function return types.
+- Frontend: first 20 rows displayed; "Show more" button adds 20 per click (`PAGE_SIZE = 20`); filter/search applies to all loaded records; amber toast warning if `page.truncated` is true.
+
+## AI Advisor Changes (April 2026)
+
+- **AI consistency layer removed from GAP reports**: no longer auto-runs `aiConsistencyAnalysis` when opening a GAP report; no AI section in report body; no AI badge in advisor panel header.
+- **Clean records**: show "No GAPs to report" (muted italic `.figafClean` class) instead of "Open GAP report" button.
+- **AI chat context**: `chatContext()` now includes `allGapReports` — all inconsistent reports with their findings. Backend system prompt instructs the AI to read `allGapReports` before answering and cite specific record + rule + field when referencing findings.
+- The `aiConsistencyAnalysis` CAP action and `runAiConsistencyAnalysis()` JS function remain in code but are no longer triggered automatically.

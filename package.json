@@ -42,6 +42,11 @@
     },
     "features": {
       "fetch_csrf": true
+    },
+    "server": {
+      "body_parser": {
+        "limit": "5mb"
+      }
     }
   }
 }

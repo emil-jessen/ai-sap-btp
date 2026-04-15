@@ -143,11 +143,32 @@ App URL after deployment:
 
 ## What's Still To Do / Test
 
-- [ ] Deploy the fixed build: run `mbt build` then `cf deploy mta_archives/my-btp-app_1.0.0.mtar`
-- [ ] Verify app loads correctly end-to-end after deployment (no more 503)
-- [ ] Test OData calls from UI to CAP backend (`/catalog/` endpoint)
-- [ ] Add real data model / entities to the CDS schema if needed
-- [ ] Consider adding roles/authorizations to xs-security.json
+- [ ] Verify app loads correctly end-to-end after deployment
+- [ ] Test all three model reads (Partners, Company/subsidiaries, Scenarios) with the new loading states
+- [ ] Confirm severity badges (High/Medium/Low) and "Clean" render correctly in the table
+- [ ] Confirm GAP report opens with close-button focus and Escape key closes it
+- [ ] Confirm Scenarios table shows MAG OR Main Flow populated (not both) per record
+- [ ] Confirm "No GAPs to report" shown for clean records instead of "Open GAP report" button
+- [ ] Confirm Show More pagination works (first 20 rows, +20 per click, full 200 filterable)
+- [ ] Confirm truncation toast appears when Figaf has more than 200 records
+
+---
+
+## UI Improvement History (April 2026)
+
+Applied in `app/ui/webapp/index.html` and `app/ui/webapp/css/style.css`:
+
+| # | Change | Where |
+|---|---|---|
+| 1 | Model read buttons disable + show "Reading…" during fetch; re-enable on finish | click handler |
+| 2 | "Inconsistencies detected" cell shows severity summary ("2 High · 1 Med") instead of true/false; "Clean" badge in green for no findings | `renderTable()` + CSS |
+| 3 | Connection status uses a structured indicator with a coloured dot (grey/yellow pulse/green/red) inferred from message content | `setConnectionStatus()` + CSS |
+| 4 | Table sub-heading shows agent label and load timestamp ("42 records · Dev-Figaf-EJE · 14 Apr 2026 09:45") | `renderTable()` |
+| 5 | AI layer badge in advisor header starts as "pending" and updates to "Active" / "Not available" when first GAP report AI analysis runs | `updateAiStatus()` + HTML |
+| 6 | GAP report finding list items coloured by severity: red left-border (High), orange (Medium), teal (Low) | `renderFindings()` + CSS |
+| 7 | Roadmap section updated from "Planned checks" (stale) to "Active checks" listing what actually runs | HTML |
+| 8 | "Open GAP report" `<a>` replaced with `<button data-gap-report-id>` — no more fake URL, right-click can't break it | `renderTable()` + click handler |
+| 9 | Escape key closes GAP report dialog; close button receives focus when dialog opens | `keydown` listener + `renderGapReport()` |
 
 ---
 
@@ -157,4 +178,71 @@ App URL after deployment:
 
 ---
 
-*Last updated: April 2026. Updated by Claude (Cowork session) — namespace rename completed, dist.zip rebuilt.*
+## GAP Analysis Fix History (April 2026)
+
+Applied in `app/ui/webapp/index.html`:
+
+| # | Fix | Detail |
+|---|---|---|
+| 1 | Removed duplicate Draft status findings | `addDraftStatusFindings` was called on `row` (table columns), `source` (raw payload), and `additionalData` — `row` fields are derived from `source`/`additionalData` so scanning it produced identical findings at different path labels. Removed the `row` scan. |
+| 2 | Suppressed empty-field GAP findings | Removed "Required naming metadata" (`!name`) and "Required geography metadata" (`!Country/Region Code`) checks from `analyzeEntityNaming` — these fired for absent fields which should be ignored for now. |
+| 3 | Fixed incorrect MAG / Main Flow population | Both fields were falling back to `objectData.displayedName` (the scenario's own name). `magName` now only uses real MAG fields (`magMetadata`, `b2b.magName`, `b2b.b2bScenarioName`). `mainFlowName` now only populates when `objectData.integrationObject` is present. Result: exactly one of the two is populated per record, or neither for incomplete scenarios. |
+
+---
+
+---
+
+## Figaf SaaS Connection (April 2026)
+
+The app now supports two connection modes, controlled by env vars on `my-btp-app-srv`:
+
+| Mode | Env vars required | How it works |
+|---|---|---|
+| **Destination** (BTP-hosted Figaf) | `FIGAF_USE_DESTINATION=true`, `FIGAF_DESTINATION_NAME=figaf-api` | Uses SAP Cloud SDK with the named destination |
+| **Login** (SaaS `app.figaf.com`) | `FIGAF_BASE_URL=https://app.figaf.com`, `FIGAF_USERNAME=...`, `FIGAF_PASSWORD=...` | POSTs form-encoded credentials to `/auth/login`, Bearer token returned in response `authorization` header, cached 50 min |
+
+Current `mta.yaml` settings (SaaS mode):
+- `FIGAF_BASE_URL: https://app.figaf.com`
+- `FIGAF_USE_DESTINATION: false`
+- `FIGAF_AGENT_SYSTEM_ID: emil-cd3f5509`
+- `FIGAF_USERNAME` and `FIGAF_PASSWORD` set via `cf set-env` (not in mta.yaml to avoid commit exposure)
+
+**Important**: `cf set-env` values are overwritten by `mta.yaml` `properties` on every `cf deploy`. Always update `mta.yaml` before deploying; use `cf set-env` only for secrets (`FIGAF_USERNAME`, `FIGAF_PASSWORD`, `OPENAI_API_KEY`).
+
+---
+
+## Scenario Flow Field Mapping (April 2026)
+
+B2B scenario flow data is **not** in `objectData.integrationObject` — it is in `objectData.additionalData` (a JSON string) → `b2BScenarioObjectData` nested object.
+
+Correct field mapping:
+| Column | Source field |
+|---|---|
+| Main Flow | `b2BScenarioObjectData.mainIflowTechnicalName` |
+| Main Flow Runtime Status | `b2BScenarioObjectData.mainIflowRuntimeStatus` |
+| Main Flow Runtime Version | `b2BScenarioObjectData.mainIflowRuntimeVersion` |
+| Main Flow Design Version | `b2BScenarioObjectData.mainIflowDesignVersion` |
+| Pre Flow | `b2BScenarioObjectData.preIflowTechnicalName` |
+| Post Flow | `b2BScenarioObjectData.postIflowTechnicalName` |
+| (and all `preIflow*`, `postIflow*` equivalents) | same nested object |
+
+---
+
+## UI Improvement History — Session 2 (April 2026)
+
+| # | Change | Where |
+|---|---|---|
+| 1 | Dual connection mode: BTP destination OR SaaS email+password login with 50-min token cache and 401 auto-retry | `srv/figaf-service.js` |
+| 2 | Scenario flow fields (Main/Pre/Post Flow + Runtime Status/Version/Design Version) now read from correct `b2BScenarioObjectData` nested object | `index.html` `scenarioRow()` |
+| 3 | GAP rule: all Flow Runtime Status fields must be `STARTED` (High severity) | `analyzeScenarioNaming()` |
+| 4 | GAP rule: runtime version must equal design version for same flow (Medium severity) | `analyzeScenarioNaming()` |
+| 5 | Clean records show "No GAPs to report" (muted italic) instead of "Open GAP report" button | `renderTable()` |
+| 6 | Fetch limit raised to 200 records; first 20 displayed; "Show more" adds 20 per click; filter applies to all 200 | `index.html`, `srv/figaf-service.js` |
+| 7 | Amber toast warning when Figaf has more than 200 records (uses `totalCountOfIntegrationObjects`) | `showTruncationWarning()` + CSS |
+| 8 | AI consistency layer removed from GAP reports (auto-run on open and AI section in report body) | `renderGapReport()`, `renderGapReportContent()` |
+| 9 | AI advisor chat now sends **all loaded GAP reports** (inconsistent ones with findings) in context, not just the active one | `chatContext()` |
+| 10 | Backend system prompt updated: AI reads `allGapReports` before answering, cites record title + rule + field when referencing findings | `_aiAdviceChat()` in `figaf-service.js` |
+
+---
+
+*Last updated: April 2026. Updated by Claude — SaaS auth, flow field fix, GAP rules, pagination, AI advisor improvements.*

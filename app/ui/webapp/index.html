@@ -17,11 +17,116 @@
         </p>
       </div>
       <div class="figafHeroVisual">
-        <img
-          src="https://figaf.com/wp-content/uploads/2025/11/2510-Release-1024x536.png"
-          alt="Figaf B2B overview"
-          class="figafHeroImage" />
-        <p class="figafImageCaption">B2B landscape readiness</p>
+        <svg class="figafHeroImage" viewBox="0 0 448 256" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="B2B integration network: trading partners connected to a company through active and draft agreements">
+          <defs>
+            <linearGradient id="heroBg" x1="0" y1="0" x2="448" y2="256" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#0c1e27"/>
+              <stop offset="100%" stop-color="#0a2820"/>
+            </linearGradient>
+            <radialGradient id="hubGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#0a6b5b" stop-opacity="0.22"/>
+              <stop offset="100%" stop-color="#0a6b5b" stop-opacity="0"/>
+            </radialGradient>
+            <pattern id="heroDots" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+              <circle cx="0.5" cy="0.5" r="0.8" fill="#1c3a4a" opacity="0.7"/>
+            </pattern>
+          </defs>
+
+          <!-- Background -->
+          <rect width="448" height="256" rx="10" fill="url(#heroBg)"/>
+          <rect width="448" height="256" rx="10" fill="url(#heroDots)"/>
+
+          <!-- Hub glow -->
+          <ellipse cx="224" cy="128" rx="68" ry="52" fill="url(#hubGlow)"/>
+
+          <!-- ── Connection lines ── -->
+          <!-- P1 → Company top -->
+          <line x1="184" y1="80" x2="196" y2="100" stroke="#0d7a65" stroke-width="1.2" opacity="0.6"/>
+          <!-- P2 → Company mid (main, bright) -->
+          <line x1="184" y1="128" x2="196" y2="128" stroke="#16c98d" stroke-width="2"/>
+          <!-- P3 → Company bottom -->
+          <line x1="184" y1="176" x2="196" y2="156" stroke="#0d7a65" stroke-width="1.2" opacity="0.6"/>
+          <!-- Data packet on main line -->
+          <circle cx="190" cy="128" r="3" fill="#16c98d" opacity="0.9"/>
+
+          <!-- Company → Scenario 1 -->
+          <line x1="252" y1="110" x2="296" y2="100" stroke="#16c98d" stroke-width="1.5"/>
+          <!-- Packet on S1 line -->
+          <circle cx="274" cy="105" r="2.5" fill="#16c98d" opacity="0.75"/>
+          <!-- Company → Scenario 2 (dashed / draft) -->
+          <line x1="252" y1="146" x2="296" y2="158" stroke="#e6a817" stroke-width="1.2" stroke-dasharray="4 3" opacity="0.7"/>
+
+          <!-- ── Partner pill 1 ── -->
+          <rect x="24" y="62" width="160" height="36" rx="6" fill="#0a2d24" stroke="#1a5c4a" stroke-width="1"/>
+          <circle cx="44" cy="77" r="3.5" fill="#16c98d" opacity="0.7"/>
+          <path d="M38 84 Q44 80.5 50 84" stroke="#16c98d" stroke-width="1.3" fill="none" stroke-linecap="round" opacity="0.7"/>
+          <text x="62" y="76" font-family="system-ui,-apple-system,sans-serif" font-size="10" font-weight="600" fill="#7ecec8">Partner A</text>
+          <text x="62" y="89" font-family="monospace" font-size="7.5" fill="#3a7a6a" letter-spacing="0.2">UN/EDIFACT · D96A</text>
+          <circle cx="172" cy="80" r="4" fill="#0c1e27"/><circle cx="172" cy="80" r="3" fill="#16c98d"/>
+
+          <!-- ── Partner pill 2 (active, highlighted) ── -->
+          <rect x="24" y="110" width="160" height="36" rx="6" fill="#0a3830" stroke="#16c98d" stroke-width="1.5"/>
+          <circle cx="44" cy="125" r="3.5" fill="#16c98d"/>
+          <path d="M38 132 Q44 128.5 50 132" stroke="#16c98d" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+          <text x="62" y="124" font-family="system-ui,-apple-system,sans-serif" font-size="10" font-weight="600" fill="#b0e8d8">Partner B</text>
+          <text x="62" y="137" font-family="monospace" font-size="7.5" fill="#3a9a7a" letter-spacing="0.2">UN/EDIFACT · D01B</text>
+          <circle cx="172" cy="128" r="4" fill="#0c1e27"/><circle cx="172" cy="128" r="3" fill="#16c98d"/>
+
+          <!-- ── Partner pill 3 (draft warning) ── -->
+          <rect x="24" y="158" width="160" height="36" rx="6" fill="#1e1505" stroke="#6a4a0a" stroke-width="1" stroke-dasharray="4 2"/>
+          <circle cx="44" cy="173" r="3.5" fill="#e6a817" opacity="0.85"/>
+          <path d="M38 180 Q44 176.5 50 180" stroke="#e6a817" stroke-width="1.3" fill="none" stroke-linecap="round" opacity="0.85"/>
+          <text x="62" y="172" font-family="system-ui,-apple-system,sans-serif" font-size="10" font-weight="600" fill="#d4a830">Partner C</text>
+          <text x="62" y="185" font-family="monospace" font-size="7.5" fill="#7a5a1a" letter-spacing="0.2">ASC X12 · 850</text>
+          <circle cx="172" cy="176" r="4" fill="#0c1e27"/><circle cx="172" cy="176" r="3" fill="#e6a817" opacity="0.85"/>
+
+          <!-- ── Company node ── -->
+          <rect x="196" y="100" width="56" height="56" rx="10" fill="#0a3830" stroke="#16c98d" stroke-width="1.5"/>
+          <!-- Building windows -->
+          <rect x="208" y="115" width="32" height="24" rx="1.5" stroke="#16c98d" stroke-width="1.2" fill="none"/>
+          <rect x="212" y="119" width="5" height="5" rx="0.5" fill="#16c98d" opacity="0.85"/>
+          <rect x="221" y="119" width="5" height="5" rx="0.5" fill="#16c98d" opacity="0.85"/>
+          <rect x="230" y="119" width="5" height="5" rx="0.5" fill="#16c98d" opacity="0.85"/>
+          <rect x="212" y="128" width="5" height="5" rx="0.5" fill="#16c98d" opacity="0.85"/>
+          <rect x="221" y="128" width="5" height="5" rx="0.5" fill="#16c98d" opacity="0.85"/>
+          <rect x="230" y="128" width="5" height="5" rx="0.5" fill="#16c98d" opacity="0.85"/>
+          <rect x="219" y="133" width="10" height="6" rx="0.5" fill="#16c98d" opacity="0.6"/>
+          <!-- Roof line -->
+          <path d="M202 115 L224 104 L246 115" stroke="#16c98d" stroke-width="1" fill="none" opacity="0.35"/>
+          <!-- Active badge top-right -->
+          <circle cx="244" cy="106" r="5" fill="#0c1e27"/>
+          <circle cx="244" cy="106" r="4" fill="#16c98d"/>
+
+          <!-- ── Scenario card 1 (Active) ── -->
+          <rect x="296" y="68" width="140" height="64" rx="7" fill="#0a3830" stroke="#16c98d" stroke-width="1.5"/>
+          <rect x="296" y="68" width="140" height="10" rx="7" fill="#16c98d" opacity="0.18"/>
+          <circle cx="309" cy="81" r="3.5" fill="#16c98d"/>
+          <text x="320" y="84" font-family="system-ui,-apple-system,sans-serif" font-size="9" font-weight="600" fill="#b0e8d8">EDIFACT Agreement</text>
+          <text x="308" y="100" font-family="monospace" font-size="7.5" fill="#3a9a7a">b2b.partner_b.ord.inb</text>
+          <text x="308" y="113" font-family="monospace" font-size="7.5" fill="#3a9a7a">.un_edifact · Active</text>
+          <rect x="370" y="118" width="58" height="10" rx="5" fill="#0a2820"/>
+          <text x="399" y="126" text-anchor="middle" font-family="system-ui,sans-serif" font-size="7" fill="#3a9a7a">✓ 0 findings</text>
+
+          <!-- ── Scenario card 2 (Draft warning) ── -->
+          <rect x="296" y="148" width="140" height="64" rx="7" fill="#1e1505" stroke="#e6a817" stroke-width="1.2" stroke-dasharray="4 2"/>
+          <rect x="296" y="148" width="140" height="10" rx="7" fill="#e6a817" opacity="0.12"/>
+          <circle cx="309" cy="161" r="3.5" fill="#e6a817"/>
+          <text x="320" y="164" font-family="system-ui,-apple-system,sans-serif" font-size="9" font-weight="600" fill="#d4a830">ASC X12 Agreement</text>
+          <text x="308" y="180" font-family="monospace" font-size="7.5" fill="#7a5a1a">b2b.partner_c.ord.inb</text>
+          <text x="308" y="193" font-family="monospace" font-size="7.5" fill="#7a5a1a">.asc_x12 · Draft</text>
+          <rect x="362" y="198" width="66" height="10" rx="5" fill="#1e1505"/>
+          <text x="395" y="206" text-anchor="middle" font-family="system-ui,sans-serif" font-size="7" fill="#b7830c">⚠ 2 findings</text>
+
+          <!-- Section labels -->
+          <text x="104" y="222" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#2a5a4a" letter-spacing="1.2" font-weight="700">PARTNERS</text>
+          <text x="224" y="222" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#2a5a4a" letter-spacing="1.2" font-weight="700">COMPANY</text>
+          <text x="366" y="222" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#2a5a4a" letter-spacing="1.2" font-weight="700">SCENARIOS</text>
+
+          <!-- Corner accent lines -->
+          <rect x="0" y="0" width="4" height="36" rx="2" fill="#0a6b5b" opacity="0.5"/>
+          <rect x="0" y="0" width="36" height="4" rx="2" fill="#0a6b5b" opacity="0.5"/>
+        </svg>
+        <p class="figafImageCaption">Live B2B integration landscape · hover any card to drill down</p>
       </div>
     </section>
 
@@ -31,7 +136,12 @@
       <div class="figafLivePanel" aria-live="polite">
         <div class="figafConnectionSummary">
           <strong class="figafChecklistTitle">Figaf connection</strong>
-          <p id="figafConnectionStatus" class="figafBodyText">Not checked yet.</p>
+          <div id="figafConnectionStatus" class="figafConnectionIndicator" data-status="idle">
+            <div class="figafStatusRow">
+              <span class="figafStatusDot" aria-hidden="true"></span>
+              <span id="figafConnectionMessage" class="figafBodyText">Not checked yet.</span>
+            </div>
+          </div>
         </div>
         <label class="figafAgentField" for="figafAgentSelect">
           <span>Agent</span>
@@ -42,19 +152,44 @@
       </div>
       <div class="figafCards">
         <article class="figafCard">
-          <span class="figafCardIcon" aria-hidden="true">P</span>
+          <span class="figafCardIcon" aria-hidden="true">
+            <svg width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="8" cy="6" r="4" fill="currentColor" opacity="0.45"/>
+              <path d="M1 19Q8 14 15 19" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.45"/>
+              <circle cx="14.5" cy="5.5" r="4.5" fill="currentColor"/>
+              <path d="M7.5 19Q14.5 14 21.5 19" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+            </svg>
+          </span>
           <h3 class="figafCardTitle">Partners</h3>
           <p class="figafCardText">Detect duplicate partner identities, missing communication partners, inconsistent identifiers, and naming drift.</p>
           <button class="figafButton figafCardButton" type="button" data-model-function="partners">Read partners</button>
         </article>
         <article class="figafCard">
-          <span class="figafCardIcon" aria-hidden="true">C</span>
+          <span class="figafCardIcon" aria-hidden="true">
+            <svg width="20" height="22" viewBox="0 0 20 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 21V9L10 3l8 6v12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="7" y="13" width="3" height="3" rx="0.5" fill="currentColor"/>
+              <rect x="12" y="13" width="3" height="3" rx="0.5" fill="currentColor"/>
+              <rect x="7" y="18" width="3" height="3" rx="0.5" fill="currentColor"/>
+              <rect x="12" y="18" width="3" height="3" rx="0.5" fill="currentColor"/>
+            </svg>
+          </span>
           <h3 class="figafCardTitle">Company/subsidiaries</h3>
           <p class="figafCardText">Check subsidiary identifiers, qualifier usage, communication setup, and parent-company alignment.</p>
           <button class="figafButton figafCardButton" type="button" data-model-function="companySubsidiaries">Read subsidiaries</button>
         </article>
         <article class="figafCard">
-          <span class="figafCardIcon" aria-hidden="true">S</span>
+          <span class="figafCardIcon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="2" width="16" height="13" rx="2" stroke="currentColor" stroke-width="1.7"/>
+              <line x1="7" y1="6.5" x2="15" y2="6.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              <line x1="7" y1="9.5" x2="15" y2="9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              <line x1="7" y1="12.5" x2="11" y2="12.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              <path d="M4 18h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+              <path d="M15 15.5l3 2.5-3 2.5" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M7 15.5l-3 2.5 3 2.5" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
           <h3 class="figafCardTitle">Scenarios</h3>
           <p class="figafCardText">Review scenario coverage, agreement update states, missing links, and migration readiness signals.</p>
           <button class="figafButton figafCardButton" type="button" data-model-function="scenarios">Read scenarios</button>
@@ -67,7 +202,9 @@
             <p class="figafEyebrow">AI advisor</p>
             <h2 id="advisor-title" class="figafSectionTitle">Ask how to fix inconsistencies.</h2>
           </div>
-          <p class="figafBodyText">The advisor uses the current table and GAP report context when available.</p>
+          <div class="figafAdvisorMeta">
+            <p class="figafBodyText">The advisor reads all loaded GAP reports when answering questions.</p>
+          </div>
         </div>
         <div id="figafChatMessages" class="figafChatMessages" aria-live="polite">
           <div class="figafChatMessage figafChatMessageAssistant">
@@ -85,21 +222,22 @@
 
     <section class="figafRoadmap" aria-labelledby="roadmap-title">
       <div class="figafRoadmapText">
-        <p class="figafEyebrow">Next integration step</p>
+        <p class="figafEyebrow">How it works</p>
         <h2 id="roadmap-title" class="figafSectionTitle">
-          Connect to the Figaf tenant API, normalize the three models, then ask the AI to explain mismatches.
+          Rule-based detection runs instantly. AI goes deeper on demand.
         </h2>
         <p class="figafBodyText">
-          The connector now uses the Figaf WebUI API calls captured from the B2B screens for scenarios, partners,
-          and company/subsidiaries.
+          Every record is scanned against the Figaf IS TPM naming guidelines the moment you read a model.
+          Open any GAP report to trigger the AI consistency layer for that record.
         </p>
       </div>
       <div class="figafChecklist">
-        <strong class="figafChecklistTitle">Planned checks</strong>
-        <span class="figafChecklistItem">Partner and subsidiary identifier collisions</span>
-        <span class="figafChecklistItem">Missing communication channel assignments</span>
-        <span class="figafChecklistItem">Scenario references to inactive or incomplete objects</span>
-        <span class="figafChecklistItem">Migration readiness and test coverage gaps</span>
+        <strong class="figafChecklistTitle">Active checks</strong>
+        <span class="figafChecklistItem">Partner and subsidiary IS TPM naming conventions</span>
+        <span class="figafChecklistItem">MIG, MAG, Agreement Template and Agreement naming</span>
+        <span class="figafChecklistItem">Draft status detection across all status fields</span>
+        <span class="figafChecklistItem">Communication channel and identifier alias conventions</span>
+        <span class="figafChecklistItem">AI-assisted per-record consistency analysis (GAP reports)</span>
       </div>
     </section>
   </main>
@@ -214,6 +352,7 @@
     var currentTableState = null;
     var gapReports = {};
     var currentGapReportId = "";
+    var modelData = {};
     var chatHistory = [];
     var AUTH_REFRESH_MESSAGE = "Your BTP app session needs to be refreshed. Sign in again, then retry the Figaf read.";
 
@@ -300,19 +439,40 @@
     }
 
     function setConnectionStatus(message, signInUrl) {
-      var status = document.getElementById("figafConnectionStatus");
-      status.textContent = message;
+      var indicator = document.getElementById("figafConnectionStatus");
+      var messageEl = document.getElementById("figafConnectionMessage");
+
+      // Remove any previously injected sign-in action
+      var existing = indicator.querySelectorAll(".figafSignInAction");
+      existing.forEach(function (el) { el.remove(); });
+
+      // Infer visual state from message content and signInUrl
+      var state;
+      if (signInUrl || /could not|error|fail|http \d|unavailable|unauthori[sz]|timeout|session/i.test(message)) {
+        state = "error";
+      } else if (/^reading/i.test(message)) {
+        state = "loading";
+      } else if (/loaded|^read \d|ready/i.test(message)) {
+        state = "ok";
+      } else {
+        state = "idle";
+      }
+
+      indicator.setAttribute("data-status", state);
+      messageEl.textContent = message;
 
       if (signInUrl) {
-        var action = document.createElement("button");
-        action.className = "figafInlineButton";
-        action.type = "button";
-        action.textContent = "Refresh sign-in";
-        action.addEventListener("click", function () {
+        var strip = document.createElement("div");
+        strip.className = "figafSignInAction";
+        var btn = document.createElement("button");
+        btn.className = "figafButton figafButtonPrimary";
+        btn.type = "button";
+        btn.textContent = "Refresh sign-in";
+        btn.addEventListener("click", function () {
           window.location.href = signInUrl;
         });
-        status.appendChild(document.createTextNode(" "));
-        status.appendChild(action);
+        strip.appendChild(btn);
+        indicator.appendChild(strip);
       }
     }
 
@@ -391,7 +551,8 @@
         hour: "2-digit",
         minute: "2-digit",
         second: "2-digit",
-        hour12: false
+        hour12: false,
+        timeZone: "UTC"
       }).format(date).replace(",", "");
     }
 
@@ -465,7 +626,8 @@
       gapReports[reportId] = report;
 
       row["Inconsistencies detected"] = report.inconsistent;
-      row["Open GAP report"] = gapReportUrl(reportId);
+      row["Open GAP report"] = reportId;
+      row["_reportId"] = reportId;
       return row;
     }
 
@@ -478,8 +640,7 @@
       var senderMig = b2b.senderMigMetadata || {};
       var receiverMig = b2b.receiverMigMetadata || {};
       var mag = b2b.magMetadata || b2b.mag || {};
-      var mainFlowName = objectData.displayedName || displayNameOrId(objectData.integrationObject, objectData.technicalName);
-      var magName = metadataName(mag) || b2b.magName || b2b.b2bScenarioName || objectData.displayedName || raw.title;
+      var magName = metadataName(mag) || b2b.magName || "";
       var reportId = reportIdFor("Scenarios", record);
 
       var row = {
@@ -500,10 +661,10 @@
         "MAG": stripMagPrefix(magName),
         "MAG Status": b2b.magStatus || metadataStatus(mag),
         "MAG Version": metadataVersion(mag),
-        "Main Flow": mainFlowName,
-        "Main Flow Runtime Status": objectData.iflowRuntimeData && (objectData.iflowRuntimeData.status || objectData.iflowRuntimeData.runtimeStatus),
-        "Main Flow Runtime Version": objectData.iflowRuntimeData && objectData.iflowRuntimeData.version,
-        "Main Flow Design Version": objectData.version,
+        "Main Flow": b2b.mainIflowTechnicalName || "",
+        "Main Flow Runtime Status": b2b.mainIflowRuntimeStatus || "",
+        "Main Flow Runtime Version": b2b.mainIflowRuntimeVersion || "",
+        "Main Flow Design Version": b2b.mainIflowDesignVersion || "",
         "Direction": b2b.direction,
         "Sender": b2b.initiator,
         "Receiver": b2b.reactor,
@@ -529,14 +690,14 @@
         "Receiver Message Type": b2b.receiverMessageType,
         "Receiver Message Version": b2b.receiverMessageVersion,
         "Receiver Archive Payload": yesNo(b2b.receiverPayloadArchived),
-        "Pre Flow": metadataName(b2b.preFlowMetadata),
-        "Pre Flow Runtime Status": metadataStatus(b2b.preFlowMetadata),
-        "Pre Flow Runtime Version": metadataVersion(b2b.preFlowMetadata),
-        "Pre Flow Design Version": "",
-        "Post Flow": metadataName(b2b.postFlowMetadata),
-        "Post Flow Runtime Status": metadataStatus(b2b.postFlowMetadata),
-        "Post Flow Runtime Version": metadataVersion(b2b.postFlowMetadata),
-        "Post Flow Design Version": "",
+        "Pre Flow": b2b.preIflowTechnicalName || "",
+        "Pre Flow Runtime Status": b2b.preIflowRuntimeStatus || "",
+        "Pre Flow Runtime Version": b2b.preIflowRuntimeVersion || "",
+        "Pre Flow Design Version": b2b.preIflowDesignVersion || "",
+        "Post Flow": b2b.postIflowTechnicalName || "",
+        "Post Flow Runtime Status": b2b.postIflowRuntimeStatus || "",
+        "Post Flow Runtime Version": b2b.postIflowRuntimeVersion || "",
+        "Post Flow Design Version": b2b.postIflowDesignVersion || "",
         "Sender MIG": metadataName(senderMig),
         "Sender MIG Status": b2b.senderMigStatus || metadataStatus(senderMig),
         "Sender MIG Version": metadataVersion(senderMig),
@@ -552,7 +713,8 @@
       var report = analyzeRecord("Scenarios", record, row, raw);
       gapReports[reportId] = report;
       row["Inconsistencies detected"] = report.inconsistent;
-      row["Open GAP report"] = gapReportUrl(reportId);
+      row["Open GAP report"] = reportId;
+      row["_reportId"] = reportId;
       return row;
     }
 
@@ -578,10 +740,9 @@
       title.textContent = report.title;
       renderGapReportContent(report);
       dialog.hidden = false;
+      var closeBtn = document.getElementById("closeGapReport");
+      if (closeBtn) { setTimeout(function () { closeBtn.focus(); }, 50); }
 
-      if (report.aiStatus === "not-run") {
-        runAiConsistencyAnalysis(reportId);
-      }
     }
 
     function renderGapReportContent(report) {
@@ -591,12 +752,9 @@
           "<span>Model: " + escapeHtml(report.model) + "</span>" +
           "<span>Status: " + escapeHtml(report.inconsistent ? "Inconsistencies detected" : "No inconsistency detected") + "</span>" +
           "<span>Generated: " + escapeHtml(formatDate(report.generatedAt)) + "</span>" +
-          "<span>AI layer: " + escapeHtml(aiStatusText(report)) + "</span>" +
         "</div>" +
         "<h3>Agent findings</h3>" +
         renderFindings(report.findings) +
-        "<h3>AI consistency layer</h3>" +
-        "<p class=\"figafBodyText\">" + escapeHtml(report.aiMessage || "AI analysis is waiting to run.") + "</p>" +
         "<h3>Naming convention baseline</h3>" +
         "<p class=\"figafBodyText\">The agent checks the Figaf IS TPM naming guideline for partner short names, identifiers, systems, communications, MIG, MAG, Agreement Template, Agreement, and B2B Scenario naming, and marks any Draft status as inconsistent.</p>";
     }
@@ -654,6 +812,7 @@
 
         report.aiStatus = analysis.configured ? "done" : "unavailable";
         report.aiMessage = analysis.message || "";
+        updateAiStatus(Boolean(analysis.configured));
         aiFindings.forEach(function (finding) {
           addFinding(report.findings, finding);
         });
@@ -674,9 +833,15 @@
       }
 
       return "<ul class=\"figafFindingList\">" + findings.map(function (finding) {
-        return "<li>" +
-          "<strong>" + escapeHtml(finding.severity) + ": " + escapeHtml(finding.rule) + "</strong>" +
+        var sev = finding.severity;
+        var severityClass = sev === "High" ? "figafFindingHigh" : sev === "Medium" ? "figafFindingMedium" : "figafFindingLow";
+        var valueHtml = (finding.value !== undefined && finding.value !== null && String(finding.value).trim() !== "")
+          ? "<span class=\"figafFindingValue\">Value: " + escapeHtml(String(finding.value)) + "</span>"
+          : "";
+        return "<li class=\"" + escapeHtml(severityClass) + "\">" +
+          "<strong>" + escapeHtml(sev) + ": " + escapeHtml(finding.rule) + "</strong>" +
           "<span>Field: " + escapeHtml(finding.field) + "</span>" +
+          valueHtml +
           "<p>" + escapeHtml(finding.detail) + "</p>" +
         "</li>";
       }).join("") + "</ul>";
@@ -685,9 +850,6 @@
     function closeGapReport() {
       document.getElementById("gapReportDialog").hidden = true;
       currentGapReportId = "";
-      if (window.location.hash.indexOf("#analysis/") === 0) {
-        history.replaceState("", document.title, window.location.pathname + window.location.search);
-      }
     }
 
     function stripMagPrefix(value) {
@@ -700,7 +862,6 @@
       var additionalData = source.objectData && parseJson(source.objectData.additionalData);
       var b2b = additionalData && additionalData.b2BScenarioObjectData ? additionalData.b2BScenarioObjectData : {};
 
-      addDraftStatusFindings(findings, row, "table");
       addDraftStatusFindings(findings, source, "payload");
       addDraftStatusFindings(findings, additionalData, "payload.objectData.additionalData");
 
@@ -732,11 +893,12 @@
 
       var currentPath = path || "record";
       if (typeof value === "string") {
-        if (isStatusField(keyName || currentPath) && value.trim().toLowerCase() === "draft") {
+        if (isStatusField(keyName || currentPath) && !isSkippedDraftField(keyName) && value.trim().toLowerCase() === "draft") {
           addFinding(findings, {
             severity: "High",
             rule: "Draft status",
             field: currentPath,
+            value: value,
             detail: "Status field is Draft. Any Draft status is treated as inconsistent."
           });
         }
@@ -761,6 +923,12 @@
       return /status/i.test(String(name || ""));
     }
 
+    function isSkippedDraftField(keyName) {
+      // magStatus is excluded: a Draft MAG is acceptable during B2B scenario setup.
+      var skip = ["magstatus"];
+      return skip.indexOf(String(keyName || "").toLowerCase()) !== -1;
+    }
+
     function analyzeScenarioNaming(findings, row, b2b) {
       var mag = row.MAG || "";
       var scenarioName = row["Displayed Name"] || (mag ? "MAG: " + mag : "");
@@ -774,6 +942,7 @@
           severity: "Medium",
           rule: "B2B Scenario Naming Convention",
           field: "Displayed Name",
+          value: scenarioName,
           detail: "Expected format: MAG: [MAG], where the MAG follows [Source MIG] to [Target MIG]."
         });
       }
@@ -783,6 +952,7 @@
           severity: "Medium",
           rule: "MAG Naming Convention",
           field: "MAG",
+          value: mag,
           detail: "Expected SAP Integration Advisor MAG proposal without the redundant Mapping prefix, formatted as [Source MIG] to [Target MIG]."
         });
       }
@@ -792,6 +962,7 @@
           severity: "Medium",
           rule: "Agreement Naming Convention",
           field: "Agreement",
+          value: agreement,
           detail: "Expected format: [Agreement Template].[partner_short_name], where partner_short_name is lowercase and ends with an ISO country/region code."
         });
       }
@@ -801,6 +972,7 @@
           severity: "Medium",
           rule: "Agreement Template Naming Convention",
           field: "Agreement Template",
+          value: template,
           detail: "Expected format: b2b.<company_or_subsidiary>.<core_process>.<direction>.<business_object>.<typeSystem>."
         });
       }
@@ -810,6 +982,7 @@
           severity: "Medium",
           rule: "Agreement Naming Convention",
           field: "Agreement",
+          value: agreement,
           detail: "Agreement should extend the Agreement Template name with partner_short_name and optional version."
         });
       }
@@ -820,47 +993,57 @@
             severity: "Medium",
             rule: "MIG Naming Convention",
             field: migName === senderMig ? "Sender MIG" : "Receiver MIG",
+            value: migName,
             detail: "Expected MIG format: [Type System] : [Message Type] : [Type System Version] : [Envelope] : [Level Code] : [Level Title]."
           });
         }
       });
 
-      if (b2b.updateStatus && String(b2b.updateStatus).toUpperCase() !== "NONE") {
-        addFinding(findings, {
-          severity: "Low",
-          rule: "Update status",
-          field: "Update Status",
-          detail: "Update status is " + b2b.updateStatus + ". Review whether the scenario is aligned with the referenced objects."
-        });
-      }
+      // Flow runtime status must be STARTED (only checked when the flow is present)
+      [
+        { label: "Main Flow", status: row["Main Flow Runtime Status"], name: row["Main Flow"] },
+        { label: "Pre Flow",  status: row["Pre Flow Runtime Status"],  name: row["Pre Flow"] },
+        { label: "Post Flow", status: row["Post Flow Runtime Status"], name: row["Post Flow"] }
+      ].forEach(function (f) {
+        if (f.name && f.status && f.status !== "STARTED") {
+          addFinding(findings, {
+            severity: "High",
+            rule: "Flow Runtime Status",
+            field: f.label + " Runtime Status",
+            value: f.status,
+            detail: f.label + " runtime status should be STARTED."
+          });
+        }
+      });
+
+      // Runtime version and design version must match for each flow
+      [
+        { label: "Main Flow", runtime: row["Main Flow Runtime Version"], design: row["Main Flow Design Version"] },
+        { label: "Pre Flow",  runtime: row["Pre Flow Runtime Version"],  design: row["Pre Flow Design Version"] },
+        { label: "Post Flow", runtime: row["Post Flow Runtime Version"], design: row["Post Flow Design Version"] }
+      ].forEach(function (f) {
+        if (f.runtime && f.design && f.runtime !== f.design) {
+          addFinding(findings, {
+            severity: "Medium",
+            rule: "Flow Version Mismatch",
+            field: f.label + " Version",
+            value: f.runtime + " (runtime) vs " + f.design + " (design)",
+            detail: f.label + " runtime version and design version should be identical."
+          });
+        }
+      });
 
       analyzeCommonNamingFields(findings, b2b, "Scenario details");
     }
 
     function analyzeEntityNaming(findings, row, source) {
-      var name = row.Name || "";
       var shortName = row["Short Name"] || "";
-      if (!name) {
-        addFinding(findings, {
-          severity: "Medium",
-          rule: "Required naming metadata",
-          field: "Name",
-          detail: "Record is missing a name."
-        });
-      }
-      if (!row["Country/Region Code"]) {
-        addFinding(findings, {
-          severity: "Low",
-          rule: "Required geography metadata",
-          field: "Country/Region Code",
-          detail: "Record is missing country/region code."
-        });
-      }
       if (shortName && !isPartnerShortName(shortName)) {
         addFinding(findings, {
           severity: "Medium",
           rule: "Partner short name convention",
           field: "Short Name",
+          value: shortName,
           detail: "Expected lowercase short name ending with _<country/region ISO code>, for example aldi_ch."
         });
       }
@@ -974,6 +1157,7 @@
           severity: "Low",
           rule: "Identifier alias naming convention",
           field: path,
+          value: text,
           detail: "Expected format: [Type System] [Scheme name] [Scheme code] : [partner long name] [partner country/region full text]."
         });
       }
@@ -983,24 +1167,27 @@
           severity: "Low",
           rule: "System naming convention",
           field: path,
+          value: text,
           detail: "Expected system name/alias format: [Type] [Deployment Type] [Application] [Purpose]."
         });
       }
 
-      if (/communication/i.test(lowerPath) && /^name$/i.test(key) && !/^\S+\s+(inb|out|inbound|outbound)\s+\d+$/i.test(text)) {
+      if (/communication/i.test(lowerPath) && /^name$/i.test(key) && !/^\S+\s+(inb|out|inbound|outbound|sender|receiver)\s+\d+$/i.test(text)) {
         addFinding(findings, {
           severity: "Low",
           rule: "Communication name convention",
           field: path,
+          value: text,
           detail: "Expected communication name format: [Adapter] [Direction] [incremental counter]."
         });
       }
 
-      if (/communication/i.test(lowerPath) && /alias/i.test(key) && !/\b(inb|out|inbound|outbound)\b/i.test(text)) {
+      if (/communication/i.test(lowerPath) && /alias/i.test(key) && !/\b(inb|out|inbound|outbound|sender|receiver)\b/i.test(text)) {
         addFinding(findings, {
           severity: "Low",
           rule: "Communication alias convention",
           field: path,
+          value: text,
           detail: "Expected communication alias format: [comm purpose description] [Adapter] [Direction]."
         });
       }
@@ -1013,6 +1200,18 @@
       });
       if (!exists) {
         findings.push(finding);
+      }
+    }
+
+    function updateAiStatus(configured) {
+      var badge = document.getElementById("figafAiStatus");
+      if (!badge) { return; }
+      if (configured === true) {
+        badge.setAttribute("data-ai", "active");
+        badge.textContent = "AI layer: Active";
+      } else {
+        badge.setAttribute("data-ai", "inactive");
+        badge.textContent = "AI layer: Not available";
       }
     }
 
@@ -1034,16 +1233,52 @@
         showingAllColumns: currentTableState.showAll
       } : null;
 
+      var allReportIds = Object.keys(gapReports);
+      var allReports = allReportIds.map(function(id) { return gapReports[id]; });
+      var inconsistentReports = allReports.filter(function(r) { return r.inconsistent; });
+
+      // Aggregate rule frequency across all reports — keep payload small
+      var ruleStats = {};
+      allReports.forEach(function(r) {
+        (r.findings || []).forEach(function(f) {
+          var key = f.rule;
+          if (!ruleStats[key]) { ruleStats[key] = { count: 0, severity: f.severity }; }
+          ruleStats[key].count++;
+        });
+      });
+      var topRules = Object.keys(ruleStats)
+        .sort(function(a, b) { return ruleStats[b].count - ruleStats[a].count; })
+        .slice(0, 20)
+        .map(function(rule) { return { rule: rule, count: ruleStats[rule].count, severity: ruleStats[rule].severity }; });
+
+      // Top 10 most problematic records (title + model + finding count + top 3 rule names)
+      var topInconsistentRecords = inconsistentReports
+        .slice().sort(function(a, b) { return b.findings.length - a.findings.length; })
+        .slice(0, 10)
+        .map(function(r) {
+          return {
+            title: r.title,
+            model: r.model,
+            findingCount: r.findings.length,
+            topRules: r.findings.slice(0, 3).map(function(f) { return f.rule; })
+          };
+        });
+
       return {
         selectedAgent: selectedAgentLabel(),
         table: tableContext,
         activeGapReport: report ? {
           title: report.title,
           model: report.model,
-          row: report.row,
-          findings: report.findings,
-          aiStatus: report.aiStatus
-        } : null
+          findings: report.findings
+        } : null,
+        allGapReports: {
+          totalLoaded: allReportIds.length,
+          inconsistentCount: inconsistentReports.length,
+          cleanCount: allReportIds.length - inconsistentReports.length,
+          topRules: topRules,
+          topInconsistentRecords: topInconsistentRecords
+        }
       };
     }
 
@@ -1084,10 +1319,13 @@
       last.querySelector("p").textContent = text;
     }
 
+    var PAGE_SIZE = 20;
+
     function renderTable(title, records, columns, options) {
       var container = document.getElementById("figafDataTable");
       var allColumns = options && options.allColumns ? options.allColumns : columns;
       var rows = records.value.map(options.rowMapper);
+      modelData[title] = { rows: rows, allColumns: allColumns };
       var onlyInconsistencies = Boolean(options && options.onlyInconsistencies);
       var displayRows = onlyInconsistencies
         ? rows.filter(function (row) { return row["Inconsistencies detected"] === true; })
@@ -1095,9 +1333,15 @@
       var showAll = options && options.showAll;
       var visibleColumns = showAll ? allColumns : columns;
       var tableId = "figafTable-" + title.replace(/[^a-z0-9]/gi, "");
+      var agentLabel = selectedAgentLabel();
+      var loadedAt = new Intl.DateTimeFormat("en-GB", {
+        day: "2-digit", month: "short", year: "numeric",
+        hour: "2-digit", minute: "2-digit", hour12: false
+      }).format(new Date()).replace(",", "");
       var recordText = displayRows.length === rows.length
         ? rows.length + " records"
         : displayRows.length + " of " + rows.length + " records";
+      recordText += " \u00b7 " + agentLabel + " \u00b7 " + loadedAt;
       var buttons =
         "<div class=\"figafTableActions\">" +
           "<button class=\"figafButton figafTableToggle\" type=\"button\" data-table-action=\"toggle-inconsistencies\">" +
@@ -1106,6 +1350,7 @@
           "<button class=\"figafButton figafTableToggle\" type=\"button\" data-table-action=\"toggle-columns\" data-show-all=\"" + (showAll ? "false" : "true") + "\">" +
             (showAll ? "Show default columns" : "Display all columns") +
           "</button>" +
+          "<button class=\"figafButton figafTableToggle\" type=\"button\" data-table-action=\"export-csv\" data-model-title=\"" + escapeHtml(title) + "\">Export CSV</button>" +
         "</div>";
 
       var header = visibleColumns.map(function (column) {
@@ -1119,19 +1364,43 @@
           "</label>" +
         "</th>";
       }).join("");
-      var body = displayRows.map(function (row) {
+      var body = displayRows.map(function (row, rowIndex) {
         var cells = visibleColumns.map(function (column) {
           var value = row[column];
           if (column === "Open GAP report") {
-            return "<td><a href=\"" + escapeHtml(value) + "\">Open GAP report</a></td>";
+            if (!row["Inconsistencies detected"]) {
+              return "<td><span class=\"figafClean\">No GAPs to report</span></td>";
+            }
+            return "<td><button class=\"figafLinkButton\" type=\"button\" data-gap-report-id=\"" + escapeHtml(row["_reportId"] || "") + "\">Open GAP report</button></td>";
           }
           if (column === "Inconsistencies detected") {
-            return "<td><span class=\"figafBoolean\">" + escapeHtml(value ? "true" : "false") + "</span></td>";
+            if (!value) {
+              return "<td><span class=\"figafBoolean\">Clean</span></td>";
+            }
+            var rep = gapReports[row["_reportId"]];
+            var fins = rep ? rep.findings : [];
+            var highCount = fins.filter(function (f) { return f.severity === "High"; }).length;
+            var medCount = fins.filter(function (f) { return f.severity === "Medium"; }).length;
+            var lowCount = fins.filter(function (f) { return f.severity === "Low"; }).length;
+            var worstClass = highCount ? "figafSeverityHigh" : medCount ? "figafSeverityMedium" : "figafSeverityLow";
+            var parts = [];
+            if (highCount) { parts.push(highCount + " High"); }
+            if (medCount) { parts.push(medCount + " Med"); }
+            if (lowCount) { parts.push(lowCount + " Low"); }
+            return "<td><span class=\"figafBoolean " + worstClass + "\">" + escapeHtml(parts.join(" \u00b7 ") || "issues") + "</span></td>";
           }
           return "<td>" + escapeHtml(value) + "</td>";
         }).join("");
-        return "<tr>" + cells + "</tr>";
+        var hidden = rowIndex >= PAGE_SIZE ? " hidden" : "";
+        return "<tr data-row-index=\"" + rowIndex + "\"" + hidden + ">" + cells + "</tr>";
       }).join("");
+
+      var showMoreHtml = displayRows.length > PAGE_SIZE
+        ? "<div class=\"figafShowMoreBar\">" +
+            "<button class=\"figafButton\" type=\"button\" data-table-action=\"show-more\">Show 20 more</button>" +
+            "<span class=\"figafShowMoreCount\">Showing " + PAGE_SIZE + " of " + displayRows.length + " records</span>" +
+          "</div>"
+        : "";
 
       container.innerHTML =
         "<div class=\"figafTableHeader\">" +
@@ -1141,7 +1410,53 @@
         "</div>" +
         "<div class=\"figafTableScroll\" id=\"" + tableId + "\">" +
           "<table class=\"figafDataGrid\"><thead><tr>" + header + "</tr><tr class=\"figafFilterRow\">" + filters + "</tr></thead><tbody>" + body + "</tbody></table>" +
-        "</div>";
+        "</div>" +
+        showMoreHtml;
+    }
+
+    function showTruncationWarning(totalCount) {
+      var existing = document.getElementById("figafTruncationWarning");
+      if (existing) { existing.remove(); }
+      var el = document.createElement("div");
+      el.id = "figafTruncationWarning";
+      el.className = "figafTruncationWarning";
+      el.innerHTML =
+        "<span>Only the first 200 of " + totalCount + " records are loaded. " +
+        "Use Figaf filters or search to narrow down, then re-read.</span>" +
+        "<button class=\"figafTruncationClose\" type=\"button\" aria-label=\"Dismiss\">\u00d7</button>";
+      document.body.appendChild(el);
+      el.querySelector(".figafTruncationClose").addEventListener("click", function () { el.remove(); });
+      setTimeout(function () { if (el.parentNode) { el.remove(); } }, 12000);
+    }
+
+    function exportToCsv(modelTitle) {
+      var data = modelData[modelTitle];
+      if (!data) { return; }
+      var columns = data.allColumns.filter(function (c) { return c !== "_reportId"; });
+      var sep = ";";
+      var lines = ["sep=" + sep];
+      lines.push(columns.map(function (c) { return csvCell(c, sep); }).join(sep));
+      data.rows.forEach(function (row) {
+        lines.push(columns.map(function (c) { return csvCell(row[c], sep); }).join(sep));
+      });
+      var blob = new Blob([lines.join("\r\n")], { type: "text/csv;charset=utf-8;" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      var ts = new Date().toISOString().slice(0, 19).replace(/[:T]/g, function (ch) { return ch === "T" ? "-" : ""; });
+      a.href = url;
+      a.download = modelTitle.replace(/[^a-z0-9]/gi, "-").toLowerCase() + "-" + ts + ".csv";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function csvCell(value, sep) {
+      var s = value === null || value === undefined ? "" : String(value);
+      if (s.indexOf(sep) !== -1 || s.indexOf('"') !== -1 || s.indexOf("\n") !== -1) {
+        return '"' + s.replace(/"/g, '""') + '"';
+      }
+      return s;
     }
 
     function applyColumnFilters(table) {
@@ -1153,14 +1468,33 @@
       }).filter(function (filter) {
         return filter.value;
       });
+      var hasFilter = filters.length > 0;
+      var pageLimit = currentTableState ? (currentTableState.pageLimit || PAGE_SIZE) : PAGE_SIZE;
 
       Array.from(table.querySelectorAll("tbody tr")).forEach(function (row) {
-        var visible = filters.every(function (filter) {
+        var matchesFilter = filters.every(function (filter) {
           var cell = row.children[filter.index];
           return cell && cell.textContent.toLowerCase().indexOf(filter.value) !== -1;
         });
-        row.hidden = !visible;
+        if (hasFilter) {
+          // When filtering: show all matching rows regardless of page limit
+          row.hidden = !matchesFilter;
+        } else {
+          // No filter: apply page limit
+          row.hidden = Number(row.getAttribute("data-row-index") || 0) >= pageLimit;
+        }
       });
+
+      // Sync show-more bar
+      var showMoreBar = document.querySelector(".figafShowMoreBar");
+      if (showMoreBar) {
+        var totalRows = table.querySelectorAll("tbody tr").length;
+        showMoreBar.hidden = hasFilter || pageLimit >= totalRows;
+        var countSpan = showMoreBar.querySelector(".figafShowMoreCount");
+        if (countSpan) {
+          countSpan.textContent = "Showing " + Math.min(pageLimit, totalRows) + " of " + totalRows + " records";
+        }
+      }
     }
 
     function renderRecords(modelName, records, showAll, onlyInconsistencies) {
@@ -1168,7 +1502,8 @@
         modelName: modelName,
         records: records,
         showAll: Boolean(showAll),
-        onlyInconsistencies: Boolean(onlyInconsistencies)
+        onlyInconsistencies: Boolean(onlyInconsistencies),
+        pageLimit: PAGE_SIZE
       };
 
       if (modelName === "partners") {
@@ -1256,21 +1591,33 @@
       var modelName = event.target.getAttribute("data-model-function");
 
       if (modelName) {
+        var clickedBtn = event.target;
+        var originalText = clickedBtn.textContent;
+        var allModelButtons = document.querySelectorAll("[data-model-function]");
+        allModelButtons.forEach(function (b) { b.disabled = true; });
+        clickedBtn.textContent = "Reading\u2026";
         var endpoint = figafFunctionUrl(modelName);
         setConnectionStatus("Reading " + endpointTitle(modelName) + "...");
         readJson(endpoint)
           .then(function (records) {
             setConnectionStatus("Read " + records.value.length + " records from " + endpointTitle(modelName) + ".");
+            if (records.truncated) {
+              showTruncationWarning(records.totalCount);
+            }
             renderRecords(modelName, records, false, false);
           })
           .catch(function (error) {
             setConnectionStatus(error.message, signInUrlFor(error));
+          })
+          .finally(function () {
+            clickedBtn.textContent = originalText;
+            allModelButtons.forEach(function (b) { b.disabled = false; });
           });
       }
 
-      if (event.target.closest("a") && event.target.closest("a").getAttribute("href").indexOf("#analysis/") !== -1) {
-        event.preventDefault();
-        renderGapReport(decodeURIComponent(event.target.closest("a").getAttribute("href").split("#analysis/")[1] || ""));
+      var gapBtn = event.target.closest("[data-gap-report-id]");
+      if (gapBtn) {
+        renderGapReport(gapBtn.getAttribute("data-gap-report-id"));
       }
 
       if (event.target.getAttribute("data-table-action") === "toggle-columns" && currentTableState) {
@@ -1289,6 +1636,21 @@
           currentTableState.showAll,
           !currentTableState.onlyInconsistencies
         );
+      }
+
+      if (event.target.getAttribute("data-table-action") === "show-more" && currentTableState) {
+        currentTableState.pageLimit += PAGE_SIZE;
+        var tableEl = document.querySelector("#figafDataTable table");
+        if (tableEl) {
+          applyColumnFilters(tableEl);
+        }
+      }
+
+      if (event.target.getAttribute("data-table-action") === "export-csv") {
+        var modelTitle = event.target.getAttribute("data-model-title");
+        if (modelTitle && modelData[modelTitle]) {
+          exportToCsv(modelTitle);
+        }
       }
     });
 
@@ -1312,8 +1674,14 @@
 
     document.addEventListener("DOMContentLoaded", function () {
       loadFigafAgents();
-      if (window.location.hash.indexOf("#analysis/") === 0) {
-        renderGapReport(decodeURIComponent(window.location.hash.replace("#analysis/", "")));
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") {
+        var dialog = document.getElementById("gapReportDialog");
+        if (!dialog.hidden) {
+          closeGapReport();
+        }
       }
     });
   </script>

@@ -86,9 +86,14 @@ service FigafService {
   function connectionGuide() returns array of ConnectionStep;
   function agents() returns array of FigafAgent;
   function modelViews(agentId : String) returns array of ModelView;
-  function partners(agentId : String) returns array of FigafRecord;
-  function companySubsidiaries(agentId : String) returns array of FigafRecord;
-  function scenarios(agentId : String) returns array of FigafRecord;
+  type FigafPage {
+    value     : array of FigafRecord;
+    truncated : Boolean;
+    totalCount: Integer;
+  }
+  function partners(agentId : String) returns FigafPage;
+  function companySubsidiaries(agentId : String) returns FigafPage;
+  function scenarios(agentId : String) returns FigafPage;
   action aiConsistencyAnalysis(payload : LargeString) returns AiAnalysis;
   action aiAdviceChat(payload : LargeString) returns AiChatResponse;
 }
