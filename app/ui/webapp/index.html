@@ -937,24 +937,59 @@
       var senderMig = row["Sender MIG"] || "";
       var receiverMig = row["Receiver MIG"] || "";
 
-      if (scenarioName && !isScenarioName(scenarioName)) {
-        addFinding(findings, {
-          severity: "Medium",
-          rule: "B2B Scenario Naming Convention",
-          field: "Displayed Name",
-          value: scenarioName,
-          detail: "Expected format: MAG: [MAG], where the MAG follows [Source MIG] to [Target MIG]."
-        });
+      if (scenarioName) {
+        var scenarioValid = false;
+        var scenarioDetail;
+        if (senderMig && receiverMig) {
+          // Compare against the actual MIGs assigned to this scenario
+          var core = scenarioName.replace(/^(MAG|CIF):\s*/i, "");
+          scenarioValid = /^(MAG|CIF):\s*/i.test(scenarioName) &&
+            core.trim() === (senderMig + " to " + receiverMig).trim();
+          if (!scenarioValid) {
+            scenarioDetail = "Expected 'MAG: " + senderMig + " to " + receiverMig +
+              "' or 'CIF: " + senderMig + " to " + receiverMig + "' (based on assigned MIGs).";
+          }
+        } else {
+          scenarioValid = isScenarioName(scenarioName);
+          if (!scenarioValid) {
+            scenarioDetail = "Expected format: 'MAG: [Source MIG] to [Target MIG]' or 'CIF: [Source MIG] to [Target MIG]'.";
+          }
+        }
+        if (!scenarioValid) {
+          addFinding(findings, {
+            severity: "Medium",
+            rule: "B2B Scenario Naming Convention",
+            field: "Displayed Name",
+            value: scenarioName,
+            detail: scenarioDetail
+          });
+        }
       }
 
-      if (mag && !isMagName(mag)) {
-        addFinding(findings, {
-          severity: "Medium",
-          rule: "MAG Naming Convention",
-          field: "MAG",
-          value: mag,
-          detail: "Expected SAP Integration Advisor MAG proposal without the redundant Mapping prefix, formatted as [Source MIG] to [Target MIG]."
-        });
+      if (mag) {
+        var magValid = false;
+        var magDetail;
+        if (senderMig && receiverMig) {
+          // Compare against the actual MIGs assigned to this scenario
+          magValid = mag.trim() === (senderMig + " to " + receiverMig).trim();
+          if (!magValid) {
+            magDetail = "Expected '" + senderMig + " to " + receiverMig + "' (based on assigned MIGs).";
+          }
+        } else {
+          magValid = isMagName(mag);
+          if (!magValid) {
+            magDetail = "Expected SAP Integration Advisor MAG proposal without the redundant Mapping prefix, formatted as [Source MIG] to [Target MIG].";
+          }
+        }
+        if (!magValid) {
+          addFinding(findings, {
+            severity: "Medium",
+            rule: "MAG Naming Convention",
+            field: "MAG",
+            value: mag,
+            detail: magDetail
+          });
+        }
       }
 
       if (agreement && !isAgreementName(agreement, template)) {
@@ -1057,7 +1092,7 @@
         return part === "inb" || part === "out";
       });
       var hasKnownTypeSystem = parts.some(function (part) {
-        return ["un_edifact", "asc_x12", "gs1_eancom", "sap_idoc", "idoc"].includes(part);
+        return ["un_edifact", "asc_x12", "gs1_eancom", "sap_idoc", "idoc", "custom"].includes(part);
       });
 
       return /^b2b\.[a-z0-9_]+(?:\.[a-z0-9_]+)*$/.test(text) &&
@@ -1090,29 +1125,40 @@
         return part.trim();
       }).filter(Boolean);
       var typeSystem = parts[0] || "";
+      // Covers UN/EDIFACT, ASC X12, SAP S/4HANA On Premise IDoc, GS1, EANCOM, etc.
       var hasKnownTypeSystem = /^(UN\/EDIFACT|ASC X12|SAP|GS1|EANCOM)/i.test(typeSystem);
-      var levelCode = parts.length >= 2 ? parts[parts.length - 2] : "";
-      var levelTitle = parts.length >= 1 ? parts[parts.length - 1] : "";
-      return parts.length >= 5 &&
-        parts.length <= 6 &&
+      // Strip optional overlay suffix — last part matching Overlay<alphanumeric+underscore>
+      // e.g. "... : 1 : Global : Overlay01_BaseV6" is a valid overlay variant of a base MIG
+      var coreParts = parts;
+      if (parts.length > 0 && /^Overlay[0-9A-Za-z_]+$/.test(parts[parts.length - 1])) {
+        coreParts = parts.slice(0, -1);
+      }
+      var levelCode = coreParts.length >= 2 ? coreParts[coreParts.length - 2] : "";
+      var levelTitle = coreParts.length >= 1 ? coreParts[coreParts.length - 1] : "";
+      // 5 or 6 core colon-separated parts; second-to-last must be a numeric level code
+      return coreParts.length >= 5 &&
+        coreParts.length <= 6 &&
         hasKnownTypeSystem &&
         /^\d+$/.test(levelCode) &&
         Boolean(levelTitle);
     }
 
     function isMagName(value) {
-      var text = String(value || "").replace(/^MAG:\s*/i, "").trim();
+      // MAG field value contains just the MAG name — no MAG:/CIF: prefix expected here
+      var text = String(value || "").trim();
+      // Reject anything starting with "Mapping" (violates SAP Integration Advisor guideline)
+      if (/^Mapping\b/i.test(text)) { return false; }
       var parts = text.split(/\s+to\s+/i);
       return parts.length === 2 &&
-        !/^Mapping\b/i.test(text) &&
         isMigName(parts[0]) &&
         isMigName(parts[1]);
     }
 
     function isScenarioName(value) {
       var text = String(value || "").trim();
-      var mag = text.replace(/^MAG:\s*/i, "");
-      return /^(MAG:\s*)?/i.test(text) && isMagName(mag);
+      // Both MAG: and CIF: are valid prefixes per the naming guideline
+      var core = text.replace(/^(MAG|CIF):\s*/i, "");
+      return Boolean(core) && isMagName(core);
     }
 
     function analyzeCommonNamingFields(findings, value, rootPath) {

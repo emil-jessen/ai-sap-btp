@@ -3,9 +3,9 @@
 const cds = require('@sap/cds');
 const { executeHttpRequest } = require('@sap-cloud-sdk/http-client');
 
-const DEFAULT_BASE_URL = 'https://emil2-figaf.cfapps.us10-001.hana.ondemand.com';
+const DEFAULT_BASE_URL = '';  // No fallback — set FIGAF_BASE_URL env var
 const DEFAULT_DESTINATION_NAME = 'figaf-api';
-const DEFAULT_AGENT_SYSTEM_ID = 'Dev-Figaf-EJE';
+const DEFAULT_AGENT_SYSTEM_ID = '';  // No fallback — set FIGAF_AGENT_SYSTEM_ID env var
 const DEFAULT_OPENAI_MODEL = 'gpt-4.1-mini';
 const AGENTS_ENDPOINT = '/api/agent/search';
 const AGENTS_SEARCH_BODY = { includeDecentralAdapterEngines: true };
@@ -160,8 +160,9 @@ module.exports = class FigafService extends cds.ApplicationService {
       };
     }
 
+    const openAiBase = (process.env.OPENAI_BASE_URL || 'https://api.openai.com').replace(/\/+$/, '');
     const input = this._parseAiPayload(req.data?.payload);
-    const response = await fetch('https://api.openai.com/v1/responses', {
+    const response = await fetch(`${openAiBase}/v1/responses`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -248,7 +249,9 @@ module.exports = class FigafService extends cds.ApplicationService {
       };
     }
 
-    const response = await fetch('https://api.openai.com/v1/responses', {
+    const openAiBase = (process.env.OPENAI_BASE_URL || 'https://api.openai.com').replace(/\/+$/, '');
+    const maxTokens = parseInt(process.env.OPENAI_MAX_TOKENS || '800', 10);
+    const response = await fetch(`${openAiBase}/v1/responses`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -257,7 +260,7 @@ module.exports = class FigafService extends cds.ApplicationService {
       body: JSON.stringify({
         model,
         temperature: 0.2,
-        max_output_tokens: 800,
+        max_output_tokens: maxTokens,
         input: [
           {
             role: 'system',
@@ -359,17 +362,27 @@ module.exports = class FigafService extends cds.ApplicationService {
 
   _namingGuidelineSummary() {
     return {
-      partnerShortName: 'lowercase first word(s) from partner name joined with underscores, followed by _<country/region ISO code>, e.g. aldi_ch',
+      partnerShortName: 'Lowercase first word(s) from full partner name joined with underscores, followed by _<ISO country code>. Example: aldi_ch, amazon_us, bauhaus_hamburg_de',
       identifierAlias: '[Type System] [Scheme name] [Scheme code] : [partner long name] [partner country/region full text]',
       systemNameAlias: '[Type] [Deployment Type] [Application] [Purpose]',
       communicationName: '[Adapter] [Direction] [incremental counter per adapter type + direction]',
       communicationAlias: '[comm purpose description] [Adapter] [Direction]',
-      mig: '[Type System] : [Message Type] : [Type System Version] : [Envelope] : [level code] : [level title]',
-      mag: '[Source MIG] to [Target MIG], using SAP Integration Advisor proposal without redundant Mapping prefix',
-      agreementTemplate: 'b2b.<company/subsidiary short name>.<core process>.<direction>.<business object>.<typeSystem>',
-      agreement: '[Agreement Template].[partner_short_name]',
-      b2bScenario: 'optional MAG: prefix followed by MAG name',
-      hardStatusRule: 'Any status field with value Draft is inconsistent'
+      mig: 'Colon-separated: [Type System] : [Message Type] : [Type System Version] : [Envelope] : [level code] : [level title]. ' +
+        'Examples: "UN/EDIFACT : ORDERS - Purchase order message : D.96A S3 : EnvS3 : 1 : Global", ' +
+        '"ASC X12 : 850 - Purchase Order : 004010 : Env : 1 : Global", ' +
+        '"SAP S/4HANA On Premise IDoc : ORDERS.ORDERS05 - Order : 1809 FPS02 : 1 : Global"',
+      mag: '[Source MIG] to [Target MIG] — SAP Integration Advisor proposal, NO redundant "Mapping" prefix. ' +
+        'Example: "UN/EDIFACT : ORDERS - Purchase order message : D.96A S3 : EnvS3 : 1 : Global to SAP S/4HANA On Premise IDoc : ORDERS.ORDERS05 - Order : 1809 FPS02 : 1 : Global"',
+      agreementTemplate: 'b2b.<company_or_subsidiary_short_name>[.<trading_partner>].<core_process>.<direction(inb|out)>.<business_object>.<typeSystem>. ' +
+        'Examples: "b2b.grundfos_parent_dk.sales.out.invoice.asc_x12", ' +
+        '"b2b.grundfos_parent_dk.openecx_dk.sales.inb.order.gs1_eancom"',
+      agreement: '[Agreement Template].[partner_short_name]. ' +
+        'Examples: "b2b.grundfos_parent_dk.sales.out.invoice.asc_x12.aldi_ch", ' +
+        '"b2b.grundfos_parent_dk.openecx_dk.sales.inb.order.un_edifact.bauhaus_hamburg_de"',
+      b2bScenario: 'Prefix "MAG: " OR "CIF: " followed by the MAG name ([Source MIG] to [Target MIG]). ' +
+        'Examples: "MAG: UN/EDIFACT : ORDERS : D.93A S3 : WithoutEnv : 1 : Global to SAP S/4HANA On Premise IDoc : ORDERS.ORDERS05 : 1809 FPS02 : 1 : Global", ' +
+        '"CIF: UN/EDIFACT : ORDERS : D.93A S3 : WithoutEnv : 1 : Global to SAP S/4HANA On Premise IDoc : ORDERS.ORDERS05 : 1809 FPS02 : 1 : Global"',
+      hardStatusRule: 'Any status field with value "Draft" is High-severity inconsistent'
     };
   }
 
@@ -497,7 +510,7 @@ module.exports = class FigafService extends cds.ApplicationService {
       method: 'POST',
       body: {
         deleted: false,
-        countOfObjectsOnPage: 200,
+        countOfObjectsOnPage: parseInt(process.env.FIGAF_PAGE_SIZE || '200', 10),
         countOfPages: 1,
         currentPage: 1,
         existNextPage: false,
@@ -517,8 +530,9 @@ module.exports = class FigafService extends cds.ApplicationService {
     const root = this._parsePossiblyJson(response);
     const scenarios = root?.data?.integrationObjects || root?.integrationObjects || root?.data || root || [];
     const totalCount = root?.data?.totalCountOfIntegrationObjects ?? (Array.isArray(scenarios) ? scenarios.length : 0);
+    const pageSize = parseInt(process.env.FIGAF_PAGE_SIZE || '200', 10);
     const value = this._normalizeRecords('Scenarios', Array.isArray(scenarios) ? scenarios : []);
-    return { value, truncated: totalCount > 200, totalCount };
+    return { value, truncated: totalCount > pageSize, totalCount };
   }
 
   async _readConfiguredModel(model, req) {

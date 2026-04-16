@@ -1,6 +1,10 @@
 {
   "welcomeFile": "/mybtpappui/index.html",
   "authenticationMethod": "route",
+  "logout": {
+    "logoutEndpoint": "/logout",
+    "logoutPage": "/mybtpappui/index.html"
+  },
   "routes": [
     {
       "source": "^/catalog/(.*)$",
